@@ -28,34 +28,44 @@ public class OwnerMetrics {
     @JoinColumn(name = "owner_id", nullable = false, unique = true)
     private User owner;
 
+    @Builder.Default
     @Column(name = "total_reviews", nullable = false)
     private Integer totalReviews = 0;
 
+    @Builder.Default
     @Column(name = "positive_reviews", nullable = false)
     private Integer positiveReviews = 0;
 
+    @Builder.Default
     @Column(name = "neutral_reviews", nullable = false)
     private Integer neutralReviews = 0;
 
+    @Builder.Default
     @Column(name = "negative_reviews", nullable = false)
     private Integer negativeReviews = 0;
 
+    @Builder.Default
     @Column(name = "security_flags", nullable = false)
     private Integer securityFlags = 0;
 
+    @Builder.Default
     @Column(name = "cleanliness_flags", nullable = false)
     private Integer cleanlinessFlags = 0;
 
+    @Builder.Default
     @Column(name = "average_rating", nullable = false)
     private Double averageRating = 0.0;
 
+    @Builder.Default
     @Column(name = "trust_score", nullable = false)
     private Double trustScore = 100.0;
 
+    @Builder.Default
     @Column(name = "risk_level", length = 20)
     @Enumerated(EnumType.STRING)
     private RiskLevel riskLevel = RiskLevel.LOW;
 
+    @Builder.Default
     @Column(name = "updated_at", nullable = false, updatable = true)
     private LocalDateTime updatedAt = LocalDateTime.now();
 
