@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.app.entities.Booking;
+import com.app.enums.BookingPaymentStatus;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
@@ -42,4 +43,17 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
 	@Query("SELECT b FROM Booking b JOIN FETCH b.user u JOIN FETCH b.parkingSlot ps JOIN FETCH ps.parking p WHERE ps.id = :slotId ORDER BY COALESCE(b.startTime, b.arrivalDate) ASC, b.id ASC")
 	List<Booking> findTimelineBySlotId(@Param("slotId") Long slotId);
+
+	boolean existsByPaymentUtrNumberIgnoreCase(String paymentUtrNumber);
+
+	@Query("SELECT b FROM Booking b JOIN FETCH b.user u JOIN FETCH b.parkingSlot ps JOIN FETCH ps.parking p WHERE p.user.id = :ownerId AND b.paymentStatus IN :statuses ORDER BY COALESCE(b.paymentSubmittedAt, b.bookingDate) DESC, b.id DESC")
+	List<Booking> findPaymentQueueByOwnerId(@Param("ownerId") Long ownerId,
+			@Param("statuses") List<BookingPaymentStatus> statuses);
+
+	@Query("SELECT b FROM Booking b JOIN FETCH b.user u JOIN FETCH b.parkingSlot ps JOIN FETCH ps.parking p WHERE b.paymentStatus IN :statuses ORDER BY COALESCE(b.paymentSubmittedAt, b.bookingDate) DESC, b.id DESC")
+	List<Booking> findPaymentQueueForAdmin(@Param("statuses") List<BookingPaymentStatus> statuses);
+
+	@Query("SELECT b FROM Booking b WHERE b.paymentStatus = :status AND b.paymentExpiresAt IS NOT NULL AND b.paymentExpiresAt < :now")
+	List<Booking> findExpiredPendingPayments(@Param("status") BookingPaymentStatus status,
+			@Param("now") LocalDateTime now);
 }

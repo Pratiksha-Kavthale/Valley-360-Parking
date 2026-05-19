@@ -208,7 +208,10 @@ public class OwnerScoreService {
      * Get all high-risk owners for admin dashboard
      */
     public List<OwnerMetrics> getHighRiskOwners() {
-        return ownerMetricsRepository.findHighRiskOwners();
+        return ownerMetricsRepository.findHighRiskOwners(
+                java.util.Arrays.asList(
+                        OwnerMetrics.RiskLevel.HIGH,
+                        OwnerMetrics.RiskLevel.CRITICAL));
     }
 
     /**

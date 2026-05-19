@@ -18,6 +18,7 @@ import com.app.entities.ParkingArea;
 import com.app.entities.ParkingSlot;
 import com.app.entities.Review;
 import com.app.entities.User;
+import com.app.enums.BookingPaymentStatus;
 import com.app.exception.ParkingNotFoundException;
 import com.app.exception.UserNotFoundException;
 import com.app.repository.BookingRepository;
@@ -64,6 +65,11 @@ public class ReviewServiceImpl implements ReviewService {
 
         if (!"COMPLETED".equals(getBookingStatus(booking))) {
             throw new IllegalStateException("Only COMPLETED bookings can be reviewed.");
+        }
+
+        if (booking.getPaymentStatus() != null
+                && booking.getPaymentStatus() != BookingPaymentStatus.BOOKING_CONFIRMED) {
+            throw new IllegalStateException("Only confirmed bookings can be reviewed.");
         }
 
         if (reviewRepository.existsByBookingId(booking.getId())) {

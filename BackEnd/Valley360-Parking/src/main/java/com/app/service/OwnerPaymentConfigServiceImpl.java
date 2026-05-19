@@ -1,0 +1,91 @@
+package com.app.service;
+
+import java.util.Locale;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.app.dto.OwnerPaymentConfigDTO;
+import com.app.dto.OwnerPaymentConfigRequestDTO;
+import com.app.entities.OwnerPaymentConfig;
+import com.app.entities.User;
+import com.app.enums.RoleEnum;
+import com.app.exception.UserNotFoundException;
+import com.app.repository.OwnerPaymentConfigRepository;
+import com.app.repository.UserRepository;
+
+@Service
+@Transactional
+public class OwnerPaymentConfigServiceImpl implements OwnerPaymentConfigService {
+
+    @Autowired
+    private OwnerPaymentConfigRepository ownerPaymentConfigRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private ModelMapper mapper;
+
+    @Override
+    public OwnerPaymentConfigDTO getMyPaymentConfig() {
+        User owner = getAuthenticatedOwner();
+        OwnerPaymentConfig config = ownerPaymentConfigRepository.findByOwnerId(owner.getId())
+                .orElseGet(() -> createDefaultConfig(owner));
+        return mapToDto(config);
+    }
+
+    @Override
+    public OwnerPaymentConfigDTO updateMyPaymentConfig(OwnerPaymentConfigRequestDTO request) {
+        User owner = getAuthenticatedOwner();
+        OwnerPaymentConfig config = ownerPaymentConfigRepository.findByOwnerId(owner.getId())
+                .orElseGet(() -> createDefaultConfig(owner));
+
+        config.setUpiId(normalize(request.getUpiId()));
+        config.setUpiDisplayName(normalize(request.getUpiDisplayName()));
+        config.setPaymentEnabled(request.isPaymentEnabled());
+        config.setOwner(owner);
+
+        return mapToDto(ownerPaymentConfigRepository.save(config));
+    }
+
+    private OwnerPaymentConfig createDefaultConfig(User owner) {
+        OwnerPaymentConfig config = new OwnerPaymentConfig();
+        config.setOwner(owner);
+        config.setUpiId("");
+        config.setUpiDisplayName("");
+        config.setPaymentEnabled(false);
+        return config;
+    }
+
+    private OwnerPaymentConfigDTO mapToDto(OwnerPaymentConfig config) {
+        OwnerPaymentConfigDTO dto = mapper.map(config, OwnerPaymentConfigDTO.class);
+        dto.setOwnerId(config.getOwner() != null ? config.getOwner().getId() : null);
+        return dto;
+    }
+
+    private User getAuthenticatedOwner() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getName() == null) {
+            throw new SecurityException("Authentication required.");
+        }
+
+        User user = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new UserNotFoundException("Authenticated user not found."));
+        boolean ownerRole = user.getUserRoles() != null
+                && user.getUserRoles().stream().anyMatch(role -> RoleEnum.ROLE_OWNER.equals(role.getRoleName()));
+        if (!ownerRole) {
+            throw new SecurityException("Owner access required.");
+        }
+
+        return user;
+    }
+
+    private String normalize(String value) {
+        return value == null ? null : value.trim();
+    }
+}
