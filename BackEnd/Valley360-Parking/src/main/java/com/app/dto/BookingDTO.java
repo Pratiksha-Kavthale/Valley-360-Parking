@@ -14,6 +14,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import com.app.entities.ParkingSlot;
 import com.app.entities.User;
+import com.app.enums.BookingPaymentStatus;
 import com.app.enums.BookingStatus;
 import com.app.enums.VehicleType;
 
@@ -43,7 +44,25 @@ public class BookingDTO extends BaseDTO {
 
 	private BookingStatus status;
 
+	private BookingPaymentStatus paymentStatus;
+
 	private String qrToken;
+
+	private String paymentUtrNumber;
+
+	private String paymentScreenshotPath;
+
+	private String paymentScreenshotOriginalName;
+
+	private LocalDateTime paymentSubmittedAt;
+
+	private LocalDateTime paymentVerifiedAt;
+
+	private Long paymentVerifiedBy;
+
+	private String paymentVerificationNote;
+
+	private LocalDateTime paymentExpiresAt;
 
 	private int parkingHours;
 
@@ -125,12 +144,84 @@ public class BookingDTO extends BaseDTO {
 		this.status = status;
 	}
 
+	public BookingPaymentStatus getPaymentStatus() {
+		return paymentStatus;
+	}
+
+	public void setPaymentStatus(BookingPaymentStatus paymentStatus) {
+		this.paymentStatus = paymentStatus;
+	}
+
 	public String getQrToken() {
 		return qrToken;
 	}
 
 	public void setQrToken(String qrToken) {
 		this.qrToken = qrToken;
+	}
+
+	public String getPaymentUtrNumber() {
+		return paymentUtrNumber;
+	}
+
+	public void setPaymentUtrNumber(String paymentUtrNumber) {
+		this.paymentUtrNumber = paymentUtrNumber;
+	}
+
+	public String getPaymentScreenshotPath() {
+		return paymentScreenshotPath;
+	}
+
+	public void setPaymentScreenshotPath(String paymentScreenshotPath) {
+		this.paymentScreenshotPath = paymentScreenshotPath;
+	}
+
+	public String getPaymentScreenshotOriginalName() {
+		return paymentScreenshotOriginalName;
+	}
+
+	public void setPaymentScreenshotOriginalName(String paymentScreenshotOriginalName) {
+		this.paymentScreenshotOriginalName = paymentScreenshotOriginalName;
+	}
+
+	public LocalDateTime getPaymentSubmittedAt() {
+		return paymentSubmittedAt;
+	}
+
+	public void setPaymentSubmittedAt(LocalDateTime paymentSubmittedAt) {
+		this.paymentSubmittedAt = paymentSubmittedAt;
+	}
+
+	public LocalDateTime getPaymentVerifiedAt() {
+		return paymentVerifiedAt;
+	}
+
+	public void setPaymentVerifiedAt(LocalDateTime paymentVerifiedAt) {
+		this.paymentVerifiedAt = paymentVerifiedAt;
+	}
+
+	public Long getPaymentVerifiedBy() {
+		return paymentVerifiedBy;
+	}
+
+	public void setPaymentVerifiedBy(Long paymentVerifiedBy) {
+		this.paymentVerifiedBy = paymentVerifiedBy;
+	}
+
+	public String getPaymentVerificationNote() {
+		return paymentVerificationNote;
+	}
+
+	public void setPaymentVerificationNote(String paymentVerificationNote) {
+		this.paymentVerificationNote = paymentVerificationNote;
+	}
+
+	public LocalDateTime getPaymentExpiresAt() {
+		return paymentExpiresAt;
+	}
+
+	public void setPaymentExpiresAt(LocalDateTime paymentExpiresAt) {
+		this.paymentExpiresAt = paymentExpiresAt;
 	}
 
 	public int getParkingHours() {

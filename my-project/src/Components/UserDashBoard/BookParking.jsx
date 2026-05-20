@@ -123,7 +123,7 @@ const BookParking = () => {
       });
 
       alert('Booking successful!');
-      navigate('/BookingQR', {
+      navigate(`/BookingPayment/${response.data.id}`, {
         state: {
           booking: response.data,
         },

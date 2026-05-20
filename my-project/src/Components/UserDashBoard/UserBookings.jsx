@@ -12,6 +12,16 @@ const statusStyle = {
   RESERVED: 'bg-amber-100 text-amber-700',
   COMPLETED: 'bg-blue-100 text-blue-700',
   EXPIRED: 'bg-rose-100 text-rose-700',
+  CANCELLED: 'bg-slate-200 text-slate-700',
+};
+
+const paymentStatusStyle = {
+  PENDING_PAYMENT: 'bg-amber-100 text-amber-700',
+  PAYMENT_SUBMITTED: 'bg-blue-100 text-blue-700',
+  PAYMENT_VERIFIED: 'bg-emerald-100 text-emerald-700',
+  PAYMENT_REJECTED: 'bg-rose-100 text-rose-700',
+  BOOKING_CONFIRMED: 'bg-emerald-100 text-emerald-700',
+  BOOKING_CANCELLED: 'bg-slate-200 text-slate-700',
 };
 
 const formatDateTime = (value) => {
@@ -70,8 +80,8 @@ const UserBookings = () => {
   }, []);
 
   const openExtendModal = (booking) => {
-    if (String(booking.status).toUpperCase() !== 'ACTIVE') {
-      toast.error('Only active bookings can be extended.');
+    if (String(booking.status).toUpperCase() !== 'ACTIVE' || String(booking.paymentStatus || '').toUpperCase() !== 'BOOKING_CONFIRMED') {
+      toast.error('Only confirmed active bookings can be extended.');
       return;
     }
 
@@ -112,8 +122,8 @@ const UserBookings = () => {
 
   const openReviewModal = (booking) => {
     const normalizedStatus = String(booking.status || '').toUpperCase();
-    if (normalizedStatus !== 'COMPLETED') {
-      toast.error('Review is available only for completed bookings.');
+    if (normalizedStatus !== 'COMPLETED' || String(booking.paymentStatus || '').toUpperCase() !== 'BOOKING_CONFIRMED') {
+      toast.error('Review is available only for confirmed completed bookings.');
       return;
     }
     if (booking.hasReview) {
@@ -176,7 +186,10 @@ const UserBookings = () => {
             <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
               {bookings.map((booking) => {
                 const normalizedStatus = String(booking.status || '').toUpperCase();
+                const normalizedPaymentStatus = String(booking.paymentStatus || 'PENDING_PAYMENT').toUpperCase();
                 const badgeClass = statusStyle[normalizedStatus] || 'bg-slate-100 text-slate-700';
+                const paymentBadgeClass = paymentStatusStyle[normalizedPaymentStatus] || 'bg-slate-100 text-slate-700';
+                const canPay = normalizedPaymentStatus === 'PENDING_PAYMENT' || normalizedPaymentStatus === 'PAYMENT_REJECTED';
 
                 return (
                   <article
@@ -207,12 +220,17 @@ const UserBookings = () => {
                       </p>
                     </div>
 
+                    <div className="mt-4 flex flex-wrap gap-2 text-xs font-semibold">
+                      <span className={`rounded-full px-3 py-1 ${badgeClass}`}>{normalizedStatus}</span>
+                      <span className={`rounded-full px-3 py-1 ${paymentBadgeClass}`}>{normalizedPaymentStatus}</span>
+                    </div>
+
                     <div className="mt-6 flex items-center gap-3">
                       <button
                         type="button"
                         onClick={() => openExtendModal(booking)}
                         className="primary-btn disabled:cursor-not-allowed disabled:opacity-50"
-                        disabled={normalizedStatus !== 'ACTIVE'}
+                        disabled={normalizedStatus !== 'ACTIVE' || normalizedPaymentStatus !== 'BOOKING_CONFIRMED'}
                       >
                         Extend Time
                       </button>
@@ -220,10 +238,28 @@ const UserBookings = () => {
                         type="button"
                         onClick={() => openReviewModal(booking)}
                         className="rounded-md border border-rose-200 bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-700 transition hover:border-rose-300 hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-50"
-                        disabled={normalizedStatus !== 'COMPLETED' || Boolean(booking.hasReview)}
+                        disabled={normalizedStatus !== 'COMPLETED' || normalizedPaymentStatus !== 'BOOKING_CONFIRMED' || Boolean(booking.hasReview)}
                       >
                         {booking.hasReview ? 'Review Submitted' : 'Leave Review'}
                       </button>
+                      {canPay && (
+                        <button
+                          type="button"
+                          onClick={() => navigate(`/BookingPayment/${booking.id}`, { state: { booking } })}
+                          className="rounded-md border border-amber-200 bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-700 transition hover:border-amber-300 hover:bg-amber-100"
+                        >
+                          Pay Now
+                        </button>
+                      )}
+                      {normalizedPaymentStatus === 'BOOKING_CONFIRMED' && (
+                        <button
+                          type="button"
+                          onClick={() => navigate('/BookingQR', { state: { booking } })}
+                          className="rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-primary hover:text-primary"
+                        >
+                          View Entry QR
+                        </button>
+                      )}
                     </div>
                   </article>
                 );

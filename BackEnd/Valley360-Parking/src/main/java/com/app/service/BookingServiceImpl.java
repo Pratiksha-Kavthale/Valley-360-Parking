@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import com.app.dto.QrValidationResponseDTO;
 import com.app.entities.Booking;
 import com.app.entities.ParkingSlot;
 import com.app.entities.User;
+import com.app.enums.BookingPaymentStatus;
 import com.app.enums.BookingStatus;
 import com.app.exception.BookingConflictException;
 import com.app.exception.ParkingNotFoundException;
@@ -48,6 +50,9 @@ public class BookingServiceImpl implements BookingService {
 
 	@Autowired
 	private ReviewRepository reviewRepository;
+
+	@Value("${app.payment.expiry-minutes:10}")
+	private long paymentExpiryMinutes;
 
 	@Override
 	public BookingDTO bookParkingSlot(BookingDTO booking) {
@@ -79,6 +84,8 @@ public class BookingServiceImpl implements BookingService {
 		book.setUser(user);
 		book.setParkingSlot(parkingSlot);
 		book.setStatus(BookingStatus.ACTIVE);
+		book.setPaymentStatus(BookingPaymentStatus.PENDING_PAYMENT);
+		book.setPaymentExpiresAt(LocalDateTime.now().plusMinutes(paymentExpiryMinutes));
 		book.setQrToken(generateUniqueQrToken());
 
 		Booking savedBooking = bookingRepo.save(book);
@@ -117,6 +124,19 @@ public class BookingServiceImpl implements BookingService {
 
 		List<Booking> conflicts = existingBookings.stream()
 				.filter(existing -> {
+					if (existing.getPaymentStatus() == BookingPaymentStatus.BOOKING_CANCELLED) {
+						return false;
+					}
+
+					if (existing.getPaymentExpiresAt() != null
+							&& now.isAfter(existing.getPaymentExpiresAt())
+							&& existing.getPaymentStatus() == BookingPaymentStatus.PENDING_PAYMENT) {
+						existing.setPaymentStatus(BookingPaymentStatus.BOOKING_CANCELLED);
+						existing.setStatus(BookingStatus.CANCELLED);
+						bookingRepo.save(existing);
+						return false;
+					}
+
 					LocalDateTime existingStart = existing.getStartTime() != null ? existing.getStartTime()
 							: existing.getArrivalDate();
 					LocalDateTime existingEnd = existing.getEndTime() != null ? existing.getEndTime()
@@ -174,6 +194,11 @@ public class BookingServiceImpl implements BookingService {
 
 		if (booking == null) {
 			return new QrValidationResponseDTO("INVALID", "QR token not found.", null);
+		}
+
+		if (booking.getPaymentStatus() != null
+				&& booking.getPaymentStatus() != BookingPaymentStatus.BOOKING_CONFIRMED) {
+			return new QrValidationResponseDTO("INVALID", "Booking payment is not confirmed yet.", booking.getId());
 		}
 
 		LocalDateTime now = LocalDateTime.now();
@@ -281,6 +306,11 @@ public class BookingServiceImpl implements BookingService {
 			throw new SecurityException("You can only extend your own booking.");
 		}
 
+		if (booking.getPaymentStatus() != null
+				&& booking.getPaymentStatus() != BookingPaymentStatus.BOOKING_CONFIRMED) {
+			throw new IllegalStateException("Only confirmed bookings can be extended.");
+		}
+
 		LocalDateTime resolvedEndTime = booking.getEndTime() != null ? booking.getEndTime()
 				: booking.getDepartureDate();
 		if (resolvedEndTime == null) {
@@ -366,6 +396,11 @@ public class BookingServiceImpl implements BookingService {
 		LocalDateTime now = LocalDateTime.now();
 		LocalDateTime start = booking.getStartTime() != null ? booking.getStartTime() : booking.getArrivalDate();
 		LocalDateTime end = booking.getEndTime() != null ? booking.getEndTime() : booking.getDepartureDate();
+
+		if (booking.getStatus() == BookingStatus.CANCELLED || booking.getStatus() == BookingStatus.EXPIRED
+				|| booking.getStatus() == BookingStatus.USED) {
+			return booking.getStatus().name();
+		}
 
 		System.out.println("NOW: " + now);
 		System.out.println("START: " + start);

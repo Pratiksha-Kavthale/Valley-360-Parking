@@ -146,6 +146,13 @@ const OwnerDashboard = () => {
         <span className="text-sm text-slate-500">{booking.status}</span>
       </div>
 
+      <div className="flex flex-wrap gap-2 text-xs font-semibold">
+        <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">{booking.paymentStatus || 'PENDING_PAYMENT'}</span>
+        {booking.paymentUtrNumber && (
+          <span className="rounded-full bg-amber-100 px-3 py-1 text-amber-700">UTR: {booking.paymentUtrNumber}</span>
+        )}
+      </div>
+
       <div className="space-y-2 text-sm text-slate-600">
         <p><span className="text-slate-500">Booking Time:</span> {booking.bookingDate}</p>
         <p><span className="text-slate-500">Departure Date:</span> {booking.depatureDate}</p>
@@ -271,6 +278,28 @@ const OwnerDashboard = () => {
                   onClick={() => navigate('/Update')}
                 >
                   Update Profile
+                </button>
+              </div>
+
+              <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm space-y-4">
+                <p className="text-xl font-bold text-slate-900">Payment Settings</p>
+                <p className="text-slate-600">Configure the UPI ID and display name customers will see at checkout.</p>
+                <button
+                  className="border border-slate-200 bg-white px-6 py-3 rounded-xl font-semibold text-slate-700 transition hover:border-primary hover:text-primary"
+                  onClick={() => navigate('/owner/payment-settings')}
+                >
+                  Open Settings
+                </button>
+              </div>
+
+              <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm space-y-4">
+                <p className="text-xl font-bold text-slate-900">Payment Reviews</p>
+                <p className="text-slate-600">Verify customer payment proofs before the booking is confirmed.</p>
+                <button
+                  className="border border-slate-200 bg-white px-6 py-3 rounded-xl font-semibold text-slate-700 transition hover:border-primary hover:text-primary"
+                  onClick={() => navigate('/owner/payment-review')}
+                >
+                  Review Payments
                 </button>
               </div>
 

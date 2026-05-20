@@ -60,6 +60,16 @@ const AdminDashboard = () => {
                         <div className="text-xl font-bold mt-1">Review Analytics</div>
                         <p className="mt-2 text-sm text-white/90">Track platform sentiment, average ratings, and top complaint categories.</p>
                     </button>
+
+                    <button
+                        type="button"
+                        onClick={() => navigate('/admin/payment-review')}
+                        className="text-left bg-gradient-to-br from-emerald-600 to-teal-700 text-white rounded-xl p-5 shadow-md hover:shadow-lg hover:scale-[1.01] transition"
+                    >
+                        <div className="text-xs uppercase tracking-wide opacity-90">Payments</div>
+                        <div className="text-xl font-bold mt-1">Payment Review Queue</div>
+                        <p className="mt-2 text-sm text-white/90">Verify submitted payment proofs and resolve booking confirmations.</p>
+                    </button>
                 </div>
             </div>
 

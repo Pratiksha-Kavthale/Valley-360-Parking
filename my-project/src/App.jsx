@@ -39,6 +39,10 @@ import OwnerSlotTimeline from './Components/OwnerDashBoard/OwnerSlotTimeline';
 import ProtectedRoute from './Components/ProtectedRoute';
 import OwnerRiskMonitor from './Components/AdminDashboard/OwnerRiskMonitor';
 import ReviewAnalytics from './Components/OwnerDashBoard/ReviewAnalytics';
+import BookingPayment from './Components/UserDashBoard/BookingPayment';
+import PaymentSettings from './Components/OwnerDashBoard/PaymentSettings';
+import OwnerPaymentReview from './Components/OwnerDashBoard/PaymentReview';
+import AdminPaymentReview from './Components/AdminDashboard/PaymentReview';
 
 
 function App() {
@@ -69,6 +73,7 @@ function App() {
         <Route path="/admin/owner-risk" element={<ProtectedRoute allowedRoles={["ROLE_ADMIN"]}><OwnerRiskMonitor /></ProtectedRoute>} />
         <Route path="/admin/review-analytics" element={<ProtectedRoute allowedRoles={["ROLE_ADMIN"]}><ReviewAnalytics /></ProtectedRoute>} />
         <Route path="/admin/owner-risk-monitor" element={<ProtectedRoute allowedRoles={["ROLE_ADMIN"]}><OwnerRiskMonitor /></ProtectedRoute>} />
+        <Route path="/admin/payment-review" element={<ProtectedRoute allowedRoles={["ROLE_ADMIN"]}><AdminPaymentReview /></ProtectedRoute>} />
         <Route path="/ViewAllParkingSlots" element={<ViewAllParkingSlots />} />
         <Route path="/ViewParkingArea" element={<ViewParkingArea />} />
         <Route path="/ViewOwners" element={<OwnersList />} />
@@ -87,9 +92,12 @@ function App() {
         <Route path="/owner/parking-areas/:areaId/slots" element={<ProtectedRoute allowedRoles={["ROLE_OWNER"]}><OwnerParkingSlots /></ProtectedRoute>} />
         <Route path="/owner/add-slot" element={<ProtectedRoute allowedRoles={["ROLE_OWNER"]}><ParkingSlotForm /></ProtectedRoute>} />
         <Route path="/owner/slots/:slotId/timeline" element={<ProtectedRoute allowedRoles={["ROLE_OWNER"]}><OwnerSlotTimeline /></ProtectedRoute>} />
+        <Route path="/owner/payment-settings" element={<ProtectedRoute allowedRoles={["ROLE_OWNER"]}><PaymentSettings /></ProtectedRoute>} />
+        <Route path="/owner/payment-review" element={<ProtectedRoute allowedRoles={["ROLE_OWNER"]}><OwnerPaymentReview /></ProtectedRoute>} />
         <Route path='Delete/:userid' element={<DeleteUser/>}></Route>
         <Route path='/logout' element={<Logout/>}></Route>
         <Route path="/Book/:slotId" element={<BookParking/>}></Route>
+        <Route path="/BookingPayment/:bookingId" element={<ProtectedRoute allowedRoles={["ROLE_CUSTOMER"]}><BookingPayment /></ProtectedRoute>}></Route>
         <Route path="/BookingQR" element={<BookingQR/>}></Route>
         <Route path="/user/bookings" element={<UserBookings/>}></Route>
         <Route path="/admin/validate-qr" element={<ValidateBookingQR/>}></Route>

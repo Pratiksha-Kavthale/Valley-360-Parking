@@ -36,6 +36,16 @@ const NavbarMenu = [
         title: "My Areas",
         link:"/owner/parking-areas",
     },
+    {
+        id: 6,
+        title: "Payment Settings",
+        link:"/owner/payment-settings",
+    },
+    {
+        id: 7,
+        title: "Payment Reviews",
+        link:"/owner/payment-review",
+    },
 
 ];
    
