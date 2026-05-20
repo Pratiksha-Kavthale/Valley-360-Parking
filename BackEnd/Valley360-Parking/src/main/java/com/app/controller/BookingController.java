@@ -2,23 +2,34 @@ package com.app.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.app.dto.BookingDTO;
+import com.app.dto.BookingPaymentQrResponseDTO;
+import com.app.dto.BookingPaymentSubmissionRequestDTO;
+import com.app.dto.BookingPaymentVerificationRequestDTO;
 import com.app.dto.ExtendBookingRequestDTO;
 import com.app.dto.QrValidationRequestDTO;
 import com.app.dto.QrValidationResponseDTO;
 import com.app.service.BookingService;
+import com.app.service.BookingPaymentService;
 
 @RestController
 @RequestMapping("/booking")
@@ -27,6 +38,9 @@ public class BookingController {
 
     @Autowired
     private BookingService bookingService;
+
+    @Autowired
+    private BookingPaymentService bookingPaymentService;
 
     @PostMapping("/add")
     public ResponseEntity<?> bookParkingSlot(@RequestBody BookingDTO dto) {
@@ -63,6 +77,40 @@ public class BookingController {
     public ResponseEntity<?> extendBooking(@PathVariable Long bookingId, @RequestBody ExtendBookingRequestDTO request) {
         BookingDTO updatedBooking = bookingService.extendBooking(bookingId, request.getAdditionalHours());
         return ResponseEntity.ok(updatedBooking);
+    }
+
+    @GetMapping("/{bookingId}/payment-qr")
+    public ResponseEntity<BookingPaymentQrResponseDTO> getPaymentQr(@PathVariable Long bookingId) {
+        return ResponseEntity.ok(bookingPaymentService.getPaymentQr(bookingId));
+    }
+
+    @PostMapping(value = "/{bookingId}/payment-submission", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<BookingDTO> submitPaymentProof(@PathVariable Long bookingId,
+            @Valid @ModelAttribute BookingPaymentSubmissionRequestDTO request,
+            @RequestPart(value = "screenshot", required = false) MultipartFile screenshot) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(bookingPaymentService.submitPaymentProof(bookingId, request, screenshot));
+    }
+
+    @PostMapping("/{bookingId}/payment-verify")
+    public ResponseEntity<BookingDTO> verifyPayment(@PathVariable Long bookingId,
+            @Valid @RequestBody BookingPaymentVerificationRequestDTO request) {
+        return ResponseEntity.ok(bookingPaymentService.verifyPayment(bookingId, request));
+    }
+
+    @PostMapping("/{bookingId}/payment-reject")
+    public ResponseEntity<BookingDTO> rejectPayment(@PathVariable Long bookingId,
+            @Valid @RequestBody BookingPaymentVerificationRequestDTO request) {
+        return ResponseEntity.ok(bookingPaymentService.rejectPayment(bookingId, request));
+    }
+
+    @GetMapping("/{bookingId}/payment-proof")
+    public ResponseEntity<byte[]> getPaymentProof(@PathVariable Long bookingId) {
+        byte[] proof = bookingPaymentService.getPaymentProof(bookingId);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=payment-proof.png")
+                .contentType(MediaType.IMAGE_PNG)
+                .body(proof);
     }
 
 }

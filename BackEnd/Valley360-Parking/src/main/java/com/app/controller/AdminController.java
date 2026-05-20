@@ -24,9 +24,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.app.dto.UserDTO;
 import com.app.dto.AdminOwnerRiskResponse;
+import com.app.dto.BookingDTO;
 import com.app.entities.User;
 import com.app.enums.RoleEnum;
 import com.app.security.JWTUtils;
+import com.app.service.BookingPaymentService;
 import com.app.service.AdminService;
 import com.app.service.OwnerScoreService;
 import com.app.service.ParkingAreaService;
@@ -58,6 +60,9 @@ public class AdminController {
 
 	@Autowired
 	private OwnerScoreService ownerScoreService;
+
+	@Autowired
+	private BookingPaymentService bookingPaymentService;
 
 	@GetMapping("/findByRole")
 	public ResponseEntity<List<UserDTO>> findByRole(@RequestParam String role) {
@@ -106,5 +111,11 @@ public class AdminController {
 	public ResponseEntity<List<AdminOwnerRiskResponse>> getOwnersRisk() {
 		List<AdminOwnerRiskResponse> response = ownerScoreService.getAdminOwnerRiskSummaries();
 		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/payment-review-queue")
+	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<List<BookingDTO>> getPaymentReviewQueue() {
+		return ResponseEntity.ok(bookingPaymentService.getAdminPaymentQueue());
 	}
 }
