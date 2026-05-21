@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,6 +35,7 @@ import com.app.repository.BookingRepository;
 import com.app.repository.OwnerPaymentConfigRepository;
 import com.app.repository.UserRepository;
 
+@Slf4j
 @Service
 @Transactional
 public class BookingPaymentServiceImpl implements BookingPaymentService {
@@ -66,31 +68,48 @@ public class BookingPaymentServiceImpl implements BookingPaymentService {
     @Override
     @Transactional(readOnly = true)
     public BookingPaymentQrResponseDTO getPaymentQr(Long bookingId) {
+        log.info("Requesting payment QR for booking: {}", bookingId);
+
         Booking booking = getBookingForCustomer(bookingId);
         ensurePaymentCanBeInitiated(booking);
 
         OwnerPaymentConfig config = resolveOwnerPaymentConfig(booking);
         if (!config.isPaymentEnabled()) {
+            log.warn("Payment not enabled for owner: {}", booking.getParkingSlot().getParking().getUser().getId());
             throw new IllegalStateException("Owner has disabled UPI payment for this booking.");
         }
 
         double amount = resolveBookingAmount(booking);
-        String paymentUri = paymentQrCodeService.buildPaymentUri(config, booking, amount);
-        String qrCodeBase64 = paymentQrCodeService.generateQrCodeBase64(paymentUri);
 
-        BookingPaymentQrResponseDTO response = new BookingPaymentQrResponseDTO();
-        response.setBookingId(booking.getId());
-        response.setUpiId(config.getUpiId());
-        response.setUpiDisplayName(config.getUpiDisplayName());
-        response.setAmount(amount);
-        response.setPaymentUri(paymentUri);
-        response.setQrCodeBase64(qrCodeBase64);
-        response.setQrCodeContentType("image/png");
-        response.setQrToken(booking.getQrToken());
-        response.setPaymentExpiresAt(booking.getPaymentExpiresAt());
-        response.setPaymentStatus(normalizePaymentStatus(booking.getPaymentStatus()));
-        response.setBookingStatus(resolveTimelineStatus(booking));
-        return response;
+        try {
+            log.debug("Building payment URI - Booking: {}, UPI ID: {}, Amount: {}",
+                    bookingId, config.getUpiId(), amount);
+            String paymentUri = paymentQrCodeService.buildPaymentUri(config, booking, amount);
+
+            log.debug("Generating QR code from URI: {}", paymentUri);
+            String qrCodeBase64 = paymentQrCodeService.generateQrCodeBase64(paymentUri);
+
+            log.info("QR code generated successfully for booking: {}, QR size: {} bytes",
+                    bookingId, qrCodeBase64.length());
+
+            BookingPaymentQrResponseDTO response = new BookingPaymentQrResponseDTO();
+            response.setBookingId(booking.getId());
+            response.setUpiId(config.getUpiId());
+            response.setUpiDisplayName(config.getUpiDisplayName());
+            response.setAmount(amount);
+            response.setPaymentUri(paymentUri);
+            response.setQrCodeBase64(qrCodeBase64);
+            response.setQrCodeContentType("image/png");
+            response.setQrToken(booking.getQrToken());
+            response.setPaymentExpiresAt(booking.getPaymentExpiresAt());
+            response.setPaymentStatus(normalizePaymentStatus(booking.getPaymentStatus()));
+            response.setBookingStatus(resolveTimelineStatus(booking));
+            return response;
+        } catch (Exception e) {
+            log.error("Error generating payment QR for booking: {}, UPI ID: {}",
+                    bookingId, config.getUpiId(), e);
+            throw e;
+        }
     }
 
     @Override

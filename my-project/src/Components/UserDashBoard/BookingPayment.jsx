@@ -25,6 +25,8 @@ const BookingPayment = () => {
   const [utrNumber, setUtrNumber] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('BOTH');
   const [screenshot, setScreenshot] = useState(null);
+  const [debugMode, setDebugMode] = useState(localStorage.getItem('DEBUG_UPI_QR') === 'true');
+  const [qrDebugInfo, setQrDebugInfo] = useState('');
 
   useEffect(() => {
     const loadPaymentQr = async () => {
@@ -32,15 +34,24 @@ const BookingPayment = () => {
       try {
         const response = await api.get(`/booking/${bookingId}/payment-qr`);
         setPaymentData(response.data);
+        
+        // Log payment URI for debugging
+        if (debugMode) {
+          console.log('Payment QR Data:', response.data);
+          setQrDebugInfo(`UPI URI: ${response.data.paymentUri}\n\nQR Content loaded successfully.`);
+        }
       } catch (error) {
         toast.error(error?.response?.data?.message || 'Unable to load payment QR.');
+        if (debugMode) {
+          setQrDebugInfo(`Error: ${error?.response?.data?.message || error.message}`);
+        }
       } finally {
         setLoading(false);
       }
     };
 
     loadPaymentQr();
-  }, [bookingId]);
+  }, [bookingId, debugMode]);
 
   const paymentStatus = useMemo(() => {
     return String(paymentData?.paymentStatus || booking?.paymentStatus || 'PENDING_PAYMENT').toUpperCase();
@@ -85,9 +96,57 @@ const BookingPayment = () => {
     }
   };
 
+  /**
+   * Open UPI app with payment URI (mobile deep-link support)
+   * On mobile: Opens installed UPI app (Google Pay, PhonePe, Paytm, BHIM, etc.)
+   * On desktop: Might not work (UPI is mobile-only)
+   */
   const openInUpi = () => {
-    if (paymentData?.paymentUri) {
-      window.location.href = paymentData.paymentUri;
+    if (!paymentData?.paymentUri) {
+      toast.error('Payment URI not available');
+      return;
+    }
+
+    if (debugMode) {
+      console.log('Opening UPI URI:', paymentData.paymentUri);
+    }
+
+    // Use window.location.href for deep-link on mobile
+    // On iOS/Android, this will trigger the UPI app chooser
+    window.location.href = paymentData.paymentUri;
+
+    // For devices that might not support UPI, provide fallback
+    setTimeout(() => {
+      toast.info('If UPI app did not open, please manually scan the QR code or copy the payment details.');
+    }, 1500);
+  };
+
+  /**
+   * Copy UPI URI to clipboard for manual use
+   */
+  const copyUriToClipboard = async () => {
+    if (!paymentData?.paymentUri) {
+      toast.error('Payment URI not available');
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(paymentData.paymentUri);
+      toast.success('UPI URI copied to clipboard!');
+    } catch (error) {
+      toast.error('Failed to copy to clipboard');
+    }
+  };
+
+  /**
+   * Toggle debug mode (enable with localStorage flag)
+   */
+  const toggleDebugMode = () => {
+    const newDebugMode = !debugMode;
+    setDebugMode(newDebugMode);
+    localStorage.setItem('DEBUG_UPI_QR', newDebugMode ? 'true' : 'false');
+    if (newDebugMode) {
+      toast.info('Debug mode enabled. Check browser console.');
     }
   };
 
@@ -101,12 +160,21 @@ const BookingPayment = () => {
             <h1 className="text-3xl font-bold text-slate-900">Pay for booking #{normalizedBooking.id}</h1>
             <p className="mt-2 max-w-3xl text-slate-600">Scan the QR or open the UPI app, then submit the payment screenshot or UTR for verification.</p>
           </div>
-          <button
-            onClick={() => navigate('/user/bookings')}
-            className="rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-rose-300 hover:text-rose-600"
-          >
-            Back to bookings
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={toggleDebugMode}
+              className="rounded-md border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600 transition hover:border-slate-300 hover:text-slate-700"
+              title="Toggle debug mode"
+            >
+              {debugMode ? '🐛 Debug ON' : 'Debug'}
+            </button>
+            <button
+              onClick={() => navigate('/user/bookings')}
+              className="rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-rose-300 hover:text-rose-600"
+            >
+              Back to bookings
+            </button>
+          </div>
         </div>
 
         {loading ? (
@@ -145,14 +213,21 @@ const BookingPayment = () => {
                 <div className="space-y-3 text-sm text-slate-700">
                   <p><span className="font-semibold text-slate-900">UPI ID:</span> {paymentData.upiId}</p>
                   <p><span className="font-semibold text-slate-900">Display name:</span> {paymentData.upiDisplayName}</p>
-                  <p className="break-all"><span className="font-semibold text-slate-900">UPI URI:</span> {paymentData.paymentUri}</p>
+                  <p className="break-all"><span className="font-semibold text-slate-900">UPI URI:</span> <code className="bg-slate-100 px-2 py-1 rounded text-xs">{paymentData.paymentUri}</code></p>
                   <div className="flex flex-wrap gap-3 pt-3">
                     <button
                       type="button"
                       onClick={openInUpi}
                       className="rounded-md bg-rose-500 px-5 py-3 font-semibold text-white transition hover:bg-rose-600"
                     >
-                      Open in UPI App
+                      💳 Open in UPI App
+                    </button>
+                    <button
+                      type="button"
+                      onClick={copyUriToClipboard}
+                      className="rounded-md border border-rose-200 bg-white px-5 py-3 font-semibold text-rose-600 transition hover:bg-rose-50"
+                    >
+                      📋 Copy URI
                     </button>
                     <button
                       type="button"
@@ -163,6 +238,12 @@ const BookingPayment = () => {
                     </button>
                   </div>
                 </div>
+
+              {debugMode && qrDebugInfo && (
+                <div className="mt-6 rounded-2xl border border-slate-300 bg-slate-100 p-4 text-xs font-mono text-slate-700 whitespace-pre-wrap">
+                  {qrDebugInfo}
+                </div>
+              )}
               </div>
             </section>
 
@@ -218,7 +299,7 @@ const BookingPayment = () => {
                   </div>
 
                   <div className="rounded-2xl border border-amber-100 bg-amber-50 p-4 text-sm text-amber-900">
-                    Submit either a screenshot, a UTR number, or both. The backend checks ownership, duplicates, and status transitions.
+                    Submit either a screenshot, a UTR number, or both. The owner will verify and confirm the payment.
                   </div>
 
                   <button

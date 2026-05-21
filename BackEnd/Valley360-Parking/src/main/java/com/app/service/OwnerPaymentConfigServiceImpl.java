@@ -1,7 +1,9 @@
 package com.app.service;
 
 import java.util.Locale;
+import java.util.regex.Pattern;
 
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -18,9 +20,13 @@ import com.app.exception.UserNotFoundException;
 import com.app.repository.OwnerPaymentConfigRepository;
 import com.app.repository.UserRepository;
 
+@Slf4j
 @Service
 @Transactional
 public class OwnerPaymentConfigServiceImpl implements OwnerPaymentConfigService {
+
+    // Valid UPI ID format: {username}@{bank} (e.g., merchant@okhdfcbank)
+    private static final Pattern VALID_UPI_ID_PATTERN = Pattern.compile("^[a-zA-Z0-9._-]+@[a-zA-Z0-9]+$");
 
     @Autowired
     private OwnerPaymentConfigRepository ownerPaymentConfigRepository;
@@ -45,12 +51,44 @@ public class OwnerPaymentConfigServiceImpl implements OwnerPaymentConfigService 
         OwnerPaymentConfig config = ownerPaymentConfigRepository.findByOwnerId(owner.getId())
                 .orElseGet(() -> createDefaultConfig(owner));
 
-        config.setUpiId(normalize(request.getUpiId()));
-        config.setUpiDisplayName(normalize(request.getUpiDisplayName()));
+        // Validate and set UPI ID
+        String upiId = normalize(request.getUpiId());
+        validateUpiId(upiId);
+        config.setUpiId(upiId);
+
+        // Validate and set display name
+        String displayName = normalize(request.getUpiDisplayName());
+        if (displayName == null || displayName.isEmpty()) {
+            throw new IllegalArgumentException("Display name cannot be empty");
+        }
+        if (displayName.length() > 60) {
+            throw new IllegalArgumentException("Display name must not exceed 60 characters");
+        }
+        config.setUpiDisplayName(displayName);
+
         config.setPaymentEnabled(request.isPaymentEnabled());
         config.setOwner(owner);
 
+        log.info("Updated payment config for owner: {}, UPI ID: {}", owner.getId(), upiId);
         return mapToDto(ownerPaymentConfigRepository.save(config));
+    }
+
+    /**
+     * Validate UPI ID format
+     * Expected format: username@bank (e.g., merchant@okhdfcbank)
+     */
+    private void validateUpiId(String upiId) {
+        if (upiId == null || upiId.isEmpty()) {
+            throw new IllegalArgumentException("UPI ID cannot be empty");
+        }
+
+        if (!VALID_UPI_ID_PATTERN.matcher(upiId).matches()) {
+            log.error("Invalid UPI ID format provided: {}", upiId);
+            throw new IllegalArgumentException(
+                    "Invalid UPI ID format. Expected: username@bank (e.g., merchant@okhdfcbank or user@ybl)");
+        }
+
+        log.debug("Valid UPI ID format: {}", upiId);
     }
 
     private OwnerPaymentConfig createDefaultConfig(User owner) {
