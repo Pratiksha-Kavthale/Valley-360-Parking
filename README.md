@@ -46,6 +46,10 @@ Detailed technical references are in:
 - Reviews and ratings with AI-assisted sentiment and issue flags.
 - Owner trust/risk monitoring and admin analytics dashboards.
 
+### Payment (Peer-to-Peer UPI)
+
+- Concise: Valley360 uses a peer-to-peer UPI payment approach. The platform generates a UPI payment URI and QR code for each payable booking; customers complete payments in their chosen UPI app (Google Pay, PhonePe, Paytm, BHIM, etc.). Valley360 does not process, hold, or settle funds — it only facilitates payment initiation and owner/admin verification of payment proofs. See detailed payment docs: [docs/PAYMENT.md](docs/PAYMENT.md)
+
 ## Tech Stack
 
 | Layer | Technologies |
