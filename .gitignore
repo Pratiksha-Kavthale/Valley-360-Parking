@@ -1,0 +1,21 @@
+# Valley 360 Smart Parking Platform - Root .gitignore
+
+# Environment files (contain sensitive credentials)
+.env
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Logs
+*.log
+
+# Uploads directory (runtime data)
+uploads/

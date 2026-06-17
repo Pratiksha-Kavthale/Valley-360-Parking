@@ -2,6 +2,8 @@
 
 # Valley 360 Smart Parking Platform
 
+> **🚀 Quick Start**: See [SETUP.md](SETUP.md) for complete step-by-step installation instructions.
+
 ![Status](https://img.shields.io/badge/Status-Active%20Development-yellow?style=flat-square)
 ![Java](https://img.shields.io/badge/Java-11-orange?style=flat-square)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.7.18-6DB33F?style=flat-square)
