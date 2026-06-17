@@ -66,36 +66,83 @@ const Login = () => {
     }
   };
   const RegisterNow = () => {
-    navigate(`/SignUp`); // Navigate to booking page with Slot ID
+    navigate(`/SignUp`);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-100 via-orange-100 to-amber-200 flex items-center justify-center px-4 py-8">
-      <div className="w-full max-w-4xl bg-white/80 backdrop-blur-sm rounded-2xl border border-rose-200 shadow-md p-8 flex flex-col lg:flex-row overflow-hidden">
-        <div className="w-full lg:w-1/2 bg-gradient-to-br from-rose-400 to-orange-300 text-white flex flex-col justify-center items-center text-center px-8 py-12">
-          <p className="text-sm uppercase tracking-[0.35em] text-white/80">Valley 360 Parking</p>
-          <h2 className="mt-4 text-4xl font-bold leading-tight">Welcome Back</h2>
-          <p className="mt-4 text-sm sm:text-base text-white/90">
-            Access your account securely and continue managing parking with ease.
-          </p>
+    <div className="min-h-screen bg-slate-50 flex">
+      {/* Left Side - Branding */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-rose-500 via-rose-500 to-orange-500 p-12 flex-col justify-between relative overflow-hidden">
+        {/* Background decorations */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-20 left-20 w-64 h-64 bg-white rounded-full blur-3xl" />
+          <div className="absolute bottom-20 right-20 w-96 h-96 bg-white rounded-full blur-3xl" />
         </div>
 
-        <div className="w-full lg:w-1/2 px-4 py-8 sm:px-8 lg:px-10">
-          <div className="mb-4">
-            <Link to="/" className="text-sm text-rose-600 hover:text-rose-500 mb-4 inline-block">
-              ← Back to Home
-            </Link>
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-3 relative z-10">
+          <div className="w-10 h-10 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center text-white font-bold text-lg">
+            V
+          </div>
+          <span className="text-xl font-bold text-white">Valley 360</span>
+        </Link>
+
+        {/* Content */}
+        <div className="relative z-10">
+          <h1 className="text-4xl font-bold text-white mb-4">
+            Welcome Back
+          </h1>
+          <p className="text-white/90 text-lg leading-relaxed">
+            Access your account securely and continue managing parking with ease.
+          </p>
+
+          {/* Features */}
+          <div className="mt-8 space-y-4">
+            {['Find parking spots instantly', 'Secure & fast bookings', 'Manage reservations easily'].map((feature, index) => (
+              <div key={index} className="flex items-center gap-3 text-white">
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+                <span>{feature}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="relative z-10 text-white/70 text-sm">
+          © 2026 Valley 360 Parking. All rights reserved.
+        </div>
+      </div>
+
+      {/* Right Side - Login Form */}
+      <div className="flex-1 flex flex-col justify-center px-6 py-12 lg:px-12">
+        <div className="mx-auto w-full max-w-md">
+          {/* Mobile Logo */}
+          <Link to="/" className="lg:hidden flex items-center gap-2 mb-8">
+            <div className="w-8 h-8 bg-gradient-to-br from-rose-500 to-orange-500 rounded-lg flex items-center justify-center text-white font-bold">
+              V
+            </div>
+            <span className="text-lg font-bold text-slate-900">Valley 360</span>
+          </Link>
+
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-slate-900">Sign in to your account</h2>
+            <p className="mt-2 text-slate-600">
+              Enter your credentials to access your dashboard
+            </p>
           </div>
 
-          <h2 className="text-2xl font-semibold text-slate-900">Login</h2>
-          <p className="mt-2 text-sm text-slate-600">Access your account securely</p>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
 
-          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-            {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-
-            <div className="space-y-2">
-              <label htmlFor="email" className="block text-sm font-medium text-slate-700">
-                Email address
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1.5">
+                Email Address
               </label>
               <input
                 id="email"
@@ -104,14 +151,13 @@ const Login = () => {
                 value={user.email}
                 onChange={handleChange}
                 required
-                className="w-full border border-rose-200 rounded-md px-3 py-2 text-sm text-slate-900 outline-none focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-400"
-                placeholder="Enter your email"
-                style={{ caretColor: '#1f2937' }}
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-colors"
+                placeholder="you@example.com"
               />
             </div>
 
-            <div className="space-y-2">
-              <label htmlFor="password" className="block text-sm font-medium text-slate-700">
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-1.5">
                 Password
               </label>
               <input
@@ -121,49 +167,56 @@ const Login = () => {
                 value={user.password}
                 onChange={handleChange}
                 required
-                className="w-full border border-rose-200 rounded-md px-3 py-2 text-sm text-slate-900 outline-none focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-400"
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-colors"
                 placeholder="Enter your password"
-                style={{ caretColor: '#1f2937' }}
               />
             </div>
 
-            <div className="flex items-center justify-between gap-4 pt-1">
-              <div className="flex items-center">
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2 cursor-pointer">
                 <input
-                  id="remember-me"
-                  name="remember-me"
                   type="checkbox"
-                  className="h-4 w-4 rounded border-rose-200 text-rose-600 focus:ring-rose-400"
+                  className="w-4 h-4 rounded border-slate-300 text-rose-500 focus:ring-rose-500"
                 />
-                <label htmlFor="remember-me" className="ml-2 text-sm text-slate-600">
-                  Remember me
-                </label>
+                <span className="text-sm text-slate-600">Remember me</span>
+              </label>
+              <a href="#" className="text-sm font-medium text-rose-500 hover:text-rose-600">
+                Forgot password?
+              </a>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full py-2.5 px-4 bg-gradient-to-r from-rose-500 to-orange-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl hover:from-rose-600 hover:to-orange-600 transition-all focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2"
+            >
+              Sign In
+            </button>
+
+            <p className="text-center text-sm text-slate-600">
+              Don&apos;t have an account?{' '}
+              <Link to="/SignUp" className="font-semibold text-rose-500 hover:text-rose-600">
+                Create account
+              </Link>
+            </p>
+
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-slate-200" />
               </div>
-
-              <div className="text-sm">
-                <a href="#" className="font-medium text-rose-600 hover:text-rose-500">
-                  Forgot password?
-                </a>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-4 bg-slate-50 text-slate-500">Or</span>
               </div>
             </div>
 
-            <div className="pt-2">
-              <button
-                type="submit"
-                className="w-full rounded-md py-2 bg-rose-500 hover:bg-rose-600 text-white shadow-md transition hover:scale-105 hover:shadow-md"
-              >
-                Login
-              </button>
-            </div>
-
-            <div className="pt-1 text-center">
-              <span className="text-sm text-slate-600">
-                Don&apos;t have an account?{' '}
-                <a href="/SignUp" className="font-semibold text-rose-600 hover:text-rose-500">
-                  Register
-                </a>
-              </span>
-            </div>
+            <Link
+              to="/LoginAdmin"
+              className="w-full py-2.5 px-4 border border-slate-200 text-slate-700 font-medium rounded-lg hover:bg-slate-100 transition-colors flex items-center justify-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+              Admin Login
+            </Link>
           </form>
         </div>
       </div>

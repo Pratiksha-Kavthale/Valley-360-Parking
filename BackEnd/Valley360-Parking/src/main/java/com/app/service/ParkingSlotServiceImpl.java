@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,22 +14,25 @@ import com.app.entities.ParkingSlot;
 import com.app.exception.UserNotFoundException;
 import com.app.repository.ParkingAreaRepository;
 import com.app.repository.ParkingSlotRepository;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @Transactional
 public class ParkingSlotServiceImpl implements ParkingSlotService {
 
-	@Autowired
-	private ParkingSlotRepository parkingSlotRepository;
-	
-	@Autowired
-	private ParkingAreaRepository parkingAreaRepository;
-	
-	@Autowired
-	private BookingService bookingservice;
-	
-	@Autowired
-	private ModelMapper mapper;
+	private final ParkingSlotRepository parkingSlotRepository;
+	private final ParkingAreaRepository parkingAreaRepository;
+	private final BookingService bookingservice;
+	private final ModelMapper mapper;
+
+	public ParkingSlotServiceImpl(ParkingSlotRepository parkingSlotRepository, ParkingAreaRepository parkingAreaRepository,
+			BookingService bookingservice, ModelMapper mapper) {
+		this.parkingSlotRepository = parkingSlotRepository;
+		this.parkingAreaRepository = parkingAreaRepository;
+		this.bookingservice = bookingservice;
+		this.mapper = mapper;
+	}
 	
 	@Transactional
 	@Override
@@ -40,19 +42,11 @@ public class ParkingSlotServiceImpl implements ParkingSlotService {
 				.orElseThrow(() -> new UserNotFoundException("Invalid id !!"));
 		
 		ParkingSlot parkingSlot = mapper.map(slot, ParkingSlot.class);
-		
+		System.out.println("area"+ slot);
 		parkingSlot.setParking(area);
 		
 		return parkingSlotRepository.save(parkingSlot);
 	}
-
-//	@Override
-//	public List<ParkingSlot> viewParkingSlot(Long id) {
-////		ParkingArea area = parkingAreaRepository.findById(id).orElseThrow(() -> new ParkingNotFoundException("parking not found !!"));
-//		
-//		
-//		return null;
-//	}
 	@Override
 	public List<ParkingSlotDTO> getParkingSlotsByParkingArea(Long parkingAreaId) {
         ParkingArea parkingArea = parkingAreaRepository.findById(parkingAreaId)
@@ -83,7 +77,7 @@ public class ParkingSlotServiceImpl implements ParkingSlotService {
 		List<ParkingSlot> parkingslot=parkingSlotRepository.findAll();
 		
 		return parkingslot.stream()
-                .map(ParkingSlot -> mapper.map(ParkingSlot, ParkingSlotDTO.class))
+                .map(parkingSlot -> mapper.map(parkingSlot, ParkingSlotDTO.class))
                 .collect(Collectors.toList());
 	}
 	
@@ -108,11 +102,11 @@ public class ParkingSlotServiceImpl implements ParkingSlotService {
 		List<ParkingSlot> slot=parkingSlotRepository.findByParkingArea(id);
 		
 		for (ParkingSlot parkingSlot : slot) {
-			System.out.println("sdfghjkl");
-			bookingservice.DeleteBySlotId(parkingSlot.getId());
+			log.debug("Deleting bookings for slotId={}", parkingSlot.getId());
+			bookingservice.deleteBySlotId(parkingSlot.getId());
 		}
 		if(slot!=null) {
-			System.out.println("In delete Slot");
+			log.debug("Deleting parking slots for areaId={}", id);
 		parkingSlotRepository.deleteByParkingId(id);
 		}
 	}

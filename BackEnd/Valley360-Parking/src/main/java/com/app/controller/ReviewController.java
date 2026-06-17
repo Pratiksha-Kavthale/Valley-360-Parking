@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -22,11 +21,14 @@ import com.app.service.ReviewService;
 
 @RestController
 @RequestMapping("/reviews")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "${app.cors.allowed-origins:http://localhost:5173}")
 public class ReviewController {
 
-    @Autowired
-    private ReviewService reviewService;
+    private final ReviewService reviewService;
+
+    public ReviewController(ReviewService reviewService) {
+        this.reviewService = reviewService;
+    }
 
     @PostMapping
     public ResponseEntity<ReviewResponseDTO> createReview(@Valid @RequestBody ReviewRequestDTO request) {

@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,44 +28,47 @@ import com.app.enums.RoleEnum;
 import com.app.security.CustomUserDetails;
 import com.app.security.JWTUtils;
 import com.app.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequestMapping("/User")
-@CrossOrigin(origins = "*") /*
-							 * This is useful when you want to make a resource accessible from different
-							 * domains,
-							 * such as when your frontend and backend are hosted on different domains.
-							 */
+@CrossOrigin(origins = "${app.cors.allowed-origins:http://localhost:5173}")
 public class UserController {
 
-	@Autowired
-	private UserService userService;
-	@Autowired
-	private AuthenticationManager authManager;
-	@Autowired
-	private JWTUtils utils;
-	@Autowired
-	private ModelMapper mapper;
+	private final UserService userService;
+	private final AuthenticationManager authManager;
+	private final JWTUtils utils;
+	private final ModelMapper mapper;
+
+	public UserController(UserService userService, AuthenticationManager authManager, JWTUtils utils,
+			ModelMapper mapper) {
+		this.userService = userService;
+		this.authManager = authManager;
+		this.utils = utils;
+		this.mapper = mapper;
+	}
 
 	@PostMapping("/Register")
-	public ResponseEntity<?> registerUser(@RequestBody UserDTO user) {
-
+	public ResponseEntity<String> registerUser(@RequestBody UserDTO user) {
+		System.out.println("user dto"+user);
 		userService.registerUser(user);
 		return ResponseEntity.status(HttpStatus.OK).body("User is created");
 	}
 
 	@GetMapping("/getByEmail/{email}")
-	public ResponseEntity<?> getUserByEmail(@PathVariable String email) {
+	public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
 		return new ResponseEntity<>(userService.getUserByEmail(email), HttpStatus.FOUND);
 	}
 
 	@PutMapping("/updateUser/{email}")
-	public User updateUser(@RequestBody User user, @PathVariable String email) {
-		return userService.updateUser(user, email);
+	public User updateUser(@RequestBody UserDTO user, @PathVariable String email) {
+		User updatedUser = mapper.map(user, User.class);
+		return userService.updateUser(updatedUser, email);
 	}
 
 	@PostMapping("/Login")
-	public ResponseEntity<?> login(@RequestParam String email, @RequestParam String password) {
+	public ResponseEntity<AuthResponse> login(@RequestParam String email, @RequestParam String password) {
 
 		UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email,
 				password);
@@ -76,47 +78,36 @@ public class UserController {
 		var roleList = authenticationDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority)
 				.collect(Collectors.toSet());
 		AuthResponse authResponse = new AuthResponse();
-		roleList.forEach(role -> {
-			authResponse.getUserRoles().add(RoleEnum.valueOf(role));
-		});
+		roleList.forEach(role -> authResponse.getUserRoles().add(RoleEnum.valueOf(role)));
 		String jwtToken = utils.generateJwtToken(authenticationDetails);
 		authResponse.setJwtToken(jwtToken);
 		authResponse.setToken(jwtToken);
 		authResponse.setMessage("Authentication Successfull !!");
-		// User user = userService.login(email, password);
 		mapper.map(user, authResponse);
-		// byte profilePictureBlob[] =
-		// Files.readAllBytes(Paths.get(user.getProfilePicPath()));
-		//
-		// authResponse.setProfilePicture(profilePictureBlob);
 
 		return ResponseEntity.status(HttpStatus.OK).body(authResponse);
-
-		// return ResponseEntity.ok(user);
 	}
 
 	@GetMapping("/{id}")
-	public User GetById(@PathVariable long id) {
-		System.out.println("in user controller");
+	public User getById(@PathVariable long id) {
+		System.out.println("Fetching user by id={}"+ id);
 		return userService.getById(id);
 	}
 
 	@GetMapping("/GetAllOwners")
-	public List<User> GetAllOwners() {
-		List<User> UserList = userService.GetAllOwner();
-		return UserList;
+	public List<User> getAllOwners() {
+		return userService.getAllOwners();
 	}
 
 	@GetMapping("/GetAllCustomers")
-	public List<User> GetAllCustomers() {
-		List<User> UserList = userService.GetAllCustomers();
-		return UserList;
+	public List<User> getAllCustomers() {
+		return userService.getAllCustomers();
 	}
 
 	@DeleteMapping("Delete/{id}")
-	public ResponseEntity<?> DeleteUser(@PathVariable Long id) {
+	public ResponseEntity<String> deleteUser(@PathVariable Long id) {
 
-		userService.Delete(id);
+		userService.delete(id);
 		return ResponseEntity.ok("UserDeleted");
 	}
 

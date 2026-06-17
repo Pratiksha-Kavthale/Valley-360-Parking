@@ -1,5 +1,5 @@
-import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { AuthProvider, ThemeProvider, NotificationProvider } from './contexts';
 
 // Import components
 import Navbar from './Components/Navbar';
@@ -11,6 +11,7 @@ import Footer from './Components/Footer/Footer';
 import Registation from './Components/LoginAndRegistation/Registation';
 import Login1 from './Components/LoginAndRegistation/Login1';
 import Login from './Components/LoginAndRegistation/Login';
+import LoginAdmin from './Components/LoginAndRegistation/LoginAdmin';
 import ParkingSlotForm from './Components/OwnerDashBoard/AddParkingSlot';
 import UserDashboard from './Components/UserDashBoard/UserDashBoard';
 import ViewSlots from './Components/UserDashBoard/ViewSlots';
@@ -44,11 +45,18 @@ import PaymentSettings from './Components/OwnerDashBoard/PaymentSettings';
 import OwnerPaymentReview from './Components/OwnerDashBoard/PaymentReview';
 import AdminPaymentReview from './Components/AdminDashboard/PaymentReview';
 
+// New Professional Components
+import { Login as NewLogin, Register as NewRegister } from './components/auth';
+import { UserDashboard as NewUserDashboard } from './components/dashboard';
+
 
 function App() {
   return (
-    <Router>
-      <Routes>
+    <ThemeProvider>
+      <NotificationProvider>
+        <AuthProvider>
+          <Router>
+            <Routes>
         <Route path="/" element={
           <main className='overflow-x-hidden'>
             <Navbar />
@@ -65,6 +73,7 @@ function App() {
         <Route path="/ViewSlots/:parkingId" element={<ViewSlots />} />
         <Route path="/Login1" element={<Login1 />} />
         <Route path="/Login" element={<Login />} />
+        <Route path="/LoginAdmin" element={<LoginAdmin />} />
         <Route path="/AboutUs" element={<AboutUs />} />
         <Route path="/ContactUs" element={<ContactUs />} />
         <Route path="/Update" element={<Update />} />
@@ -101,8 +110,16 @@ function App() {
         <Route path="/BookingQR" element={<BookingQR/>}></Route>
         <Route path="/user/bookings" element={<UserBookings/>}></Route>
         <Route path="/admin/validate-qr" element={<ValidateBookingQR/>}></Route>
+
+        {/* New Professional Routes (optional - can replace old ones) */}
+        <Route path="/login-new" element={<NewLogin />} />
+        <Route path="/register-new" element={<NewRegister />} />
+        <Route path="/dashboard-new" element={<NewUserDashboard />} />
       </Routes>
-    </Router>
+          </Router>
+        </AuthProvider>
+      </NotificationProvider>
+    </ThemeProvider>
   );
 }
 

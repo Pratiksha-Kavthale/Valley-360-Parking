@@ -5,17 +5,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-//import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import com.app.dto.UserDTO;
 import com.app.entities.Role;
 import com.app.entities.User;
@@ -27,28 +24,25 @@ import com.app.repository.RoleRepository;
 import com.app.repository.UserRepository;
 import com.app.security.CustomUserDetails;
 
+@Slf4j
 @Service
 @Transactional
 public class UserServiceImpl implements UserService, UserDetailsService {
 
-	@Autowired
-	private UserRepository userRepository;
-	
-	@Autowired
-	private RoleRepository roleRepository;
-	
-	@Autowired
-	private ParkingAreaService parkingareaservice;
-	
-	@Autowired
-	private PasswordEncoder passwordEncoder;
-//	
-//	@PersistenceContext
-//	private EntityManager entityManager;
-	
-		
-	@Autowired
-	private ModelMapper mapper;
+	private final UserRepository userRepository;
+	private final RoleRepository roleRepository;
+	private final ParkingAreaService parkingAreaService;
+	private final PasswordEncoder passwordEncoder;
+	private final ModelMapper mapper;
+
+	public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository,
+			ParkingAreaService parkingAreaService, PasswordEncoder passwordEncoder, ModelMapper mapper) {
+		this.userRepository = userRepository;
+		this.roleRepository = roleRepository;
+		this.parkingAreaService = parkingAreaService;
+		this.passwordEncoder = passwordEncoder;
+		this.mapper = mapper;
+	}
 	
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -56,11 +50,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 		return new CustomUserDetails(user);
 	}
 
-	//@Transactional
 	@Override
 	public User registerUser(UserDTO userDTO) {
         // Check if the role exists
-		System.out.println("id, "+userDTO.getRoleId());
+		System.out.println("Registering user with roleId={}"+ userDTO.getRoleId());
         Role role = roleRepository.findById(userDTO.getRoleId())
             .orElseThrow(() -> new InvalidIdFoundException("Invalid role ID !!"));
 
@@ -71,17 +64,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
         // Map UserDTO to User entity
         User newUser = mapper.map(userDTO, User.class);
-        
-     // Reattach the Role entity to the current persistence context
-//        role = entityManager.merge(role);
               
         // Set the role to the user
         newUser.setRole(role);
         var persistRole =  roleRepository.findById(userDTO.getRoleId()).orElseThrow();
-        Set<Role> roles = new HashSet<Role>();
+		Set<Role> roles = new HashSet<>();
         roles.add(persistRole);
         newUser.setUserRoles(roles);
-//        newUser.setUserRoles(roles);
         //Encode the user's password
         newUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
 
@@ -108,13 +97,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
 	@Override
 	public User getUserByEmail(String email) {
-		// TODO Auto-generated method stub
 		return userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("No user found with the email :"+email));
 	}
 
 	@Override
 	public void deleteUser(String email) {
-		
+		throw new UnsupportedOperationException("deleteUser by email is not supported. Use delete(Long id) instead.");
 	}
 
 	@Override
@@ -124,7 +112,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 			return user;
 			
 		}
-		throw new RuntimeException("Invalid email or password");
+		throw new InvalidIdFoundException("Invalid email or password");
 	}
 
 	@Override
@@ -137,42 +125,35 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
 	@Override
 	public User getById(long id) {
-		User u=userRepository.findById(id).orElseThrow(()->new InvalidIdFoundException("Id not found"));
-		System.out.println("in user controller");
-			return u;
-		 
+		log.debug("Fetching user by id={}", id);
+		return userRepository.findById(id).orElseThrow(()->new InvalidIdFoundException("Id not found"));
 	}
 
 	@Override
 	public long countAllOwners() {
-		long count=userRepository.countUsersByRoleName(RoleEnum.ROLE_OWNER);
-		return count;
+		return userRepository.countUsersByRoleName(RoleEnum.ROLE_OWNER);
 	}
 
 	@Override
 	public long countAllCustomers() {
-		long count1=userRepository.countUsersByRoleName1(RoleEnum.ROLE_CUSTOMER);
-		return count1;
+		return userRepository.countUsersByRoleName1(RoleEnum.ROLE_CUSTOMER);
 	}
 
 	@Override
-	public List<User> GetAllOwner() {
-		List<User> listuser=userRepository.GetAllOwners(RoleEnum.ROLE_OWNER);
-		return listuser;
+	public List<User> getAllOwners() {
+		return userRepository.GetAllOwners(RoleEnum.ROLE_OWNER);
 	}
 	@Override
-	public List<User> GetAllCustomers() {
-		List<User> listuser=userRepository.GetAllCustomers(RoleEnum.ROLE_CUSTOMER);
-		return listuser;
+	public List<User> getAllCustomers() {
+		return userRepository.GetAllCustomers(RoleEnum.ROLE_CUSTOMER);
 	}
 
 	@Transactional
 	@Override
-	public String Delete(Long id) {
-		System.out.println("in controller");
-		parkingareaservice.deleteByOwnerid(id);
-		System.out.println("in controller");
-		User u=userRepository.findById(id).orElseThrow(()-> new InvalidIdFoundException("Invalid id"));
+	public String delete(Long id) {
+		log.debug("Deleting user id={}", id);
+		parkingAreaService.deleteByOwnerid(id);
+		userRepository.findById(id).orElseThrow(()-> new InvalidIdFoundException("Invalid id"));
 		
 		userRepository.deleteById(id);
 		return "Deleted";

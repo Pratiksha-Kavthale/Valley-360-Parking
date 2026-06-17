@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -27,17 +26,19 @@ import com.app.service.OwnerViewService;
 
 @RestController
 @RequestMapping("/owner")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "${app.cors.allowed-origins:http://localhost:5173}")
 public class OwnerController {
 
-    @Autowired
-    private OwnerViewService ownerViewService;
+    private final OwnerViewService ownerViewService;
+    private final OwnerPaymentConfigService ownerPaymentConfigService;
+    private final BookingPaymentService bookingPaymentService;
 
-    @Autowired
-    private OwnerPaymentConfigService ownerPaymentConfigService;
-
-    @Autowired
-    private BookingPaymentService bookingPaymentService;
+    public OwnerController(OwnerViewService ownerViewService, OwnerPaymentConfigService ownerPaymentConfigService,
+            BookingPaymentService bookingPaymentService) {
+        this.ownerViewService = ownerViewService;
+        this.ownerPaymentConfigService = ownerPaymentConfigService;
+        this.bookingPaymentService = bookingPaymentService;
+    }
 
     @GetMapping("/parking-areas")
     @PreAuthorize("hasRole('OWNER')")

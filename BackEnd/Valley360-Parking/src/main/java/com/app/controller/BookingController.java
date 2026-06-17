@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,20 +29,24 @@ import com.app.dto.QrValidationRequestDTO;
 import com.app.dto.QrValidationResponseDTO;
 import com.app.service.BookingService;
 import com.app.service.BookingPaymentService;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequestMapping("/booking")
 @CrossOrigin(origins = "http://localhost:5173")
 public class BookingController {
 
-    @Autowired
-    private BookingService bookingService;
+    private final BookingService bookingService;
+    private final BookingPaymentService bookingPaymentService;
 
-    @Autowired
-    private BookingPaymentService bookingPaymentService;
+    public BookingController(BookingService bookingService, BookingPaymentService bookingPaymentService) {
+        this.bookingService = bookingService;
+        this.bookingPaymentService = bookingPaymentService;
+    }
 
     @PostMapping("/add")
-    public ResponseEntity<?> bookParkingSlot(@RequestBody BookingDTO dto) {
+    public ResponseEntity<BookingDTO> bookParkingSlot(@RequestBody BookingDTO dto) {
         BookingDTO createdBooking = bookingService.bookParkingSlot(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdBooking);
     }
@@ -55,26 +58,26 @@ public class BookingController {
     }
 
     @GetMapping("/today/{ownerId}")
-    public ResponseEntity<?> getTodaysBookings(@PathVariable Long ownerId) {
-        System.out.println("in bokking");
+    public ResponseEntity<List<BookingDTO>> getTodaysBookings(@PathVariable Long ownerId) {
+        log.debug("Fetching today's bookings for ownerId={}", ownerId);
         List<BookingDTO> bookings = bookingService.getTodaysBookings(ownerId);
         return ResponseEntity.ok(bookings);
     }
 
     @GetMapping("/previous/{ownerId}")
-    public ResponseEntity<?> getPreviousBookings(@PathVariable Long ownerId) {
+    public ResponseEntity<List<BookingDTO>> getPreviousBookings(@PathVariable Long ownerId) {
         List<BookingDTO> bookings = bookingService.getPreviousBookings(ownerId);
         return ResponseEntity.ok(bookings);
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<?> getUserBookings(@PathVariable Long userId) {
+    public ResponseEntity<List<BookingDTO>> getUserBookings(@PathVariable Long userId) {
         List<BookingDTO> bookings = bookingService.getUserBookings(userId);
         return ResponseEntity.ok(bookings);
     }
 
     @PutMapping("/extend/{bookingId}")
-    public ResponseEntity<?> extendBooking(@PathVariable Long bookingId, @RequestBody ExtendBookingRequestDTO request) {
+    public ResponseEntity<BookingDTO> extendBooking(@PathVariable Long bookingId, @RequestBody ExtendBookingRequestDTO request) {
         BookingDTO updatedBooking = bookingService.extendBooking(bookingId, request.getAdditionalHours());
         return ResponseEntity.ok(updatedBooking);
     }

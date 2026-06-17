@@ -5,7 +5,6 @@ import {motion} from 'framer-motion'
 import { useNavigate } from 'react-router-dom';
 
 const NavbarMenu = [
-
     {
         id: 1,
         title: "Home",
@@ -14,21 +13,18 @@ const NavbarMenu = [
     {
         id: 2,
         title: "Profile",
-        link:"/Login1",
+        link:"/Profile",
     },
-    
     {
         id: 3,
         title: "Update Profile",
         link:"/Update",
     },
-
     {
         id: 4,
         title: "My Bookings",
         link:"/user/bookings",
     },
-
 ];
    
 const NavbarUser = () => {
@@ -44,8 +40,7 @@ const NavbarUser = () => {
     };
     
   return (
-    
-    <nav className='bg-rose-50 border-b border-rose-200'>
+    <nav className='bg-white border-b border-slate-200 shadow-sm sticky top-0 z-50'>
         <motion.div 
     initial={{opacity:0}}
     animate={{opacity:1}}

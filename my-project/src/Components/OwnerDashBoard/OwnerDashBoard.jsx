@@ -49,7 +49,7 @@ const OwnerDashboard = () => {
       const response = await api.get(`http://localhost:8080/booking/today/${ownerId}`);
       setTodaysBookings(response.data);
     } catch (error) {
-      toast.error('Error fetching today\'s bookings');
+      
       console.error('Error fetching today\'s bookings:', error);
     }
   };

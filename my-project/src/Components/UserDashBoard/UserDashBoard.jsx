@@ -134,65 +134,65 @@ const UserDashboard = () => {
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true }}
-      className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm space-y-4"
+      className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition-all"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="rounded-xl bg-primary/10 p-3 text-primary">
-            <LuPin className="text-xl" />
+          <div className="rounded-lg bg-rose-50 p-2.5 text-rose-500">
+            <LuPin className="text-lg" />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-slate-900">{area.city}</h3>
+            <h3 className="text-lg font-semibold text-slate-900">{area.city}</h3>
             <p className="text-sm text-slate-500">{area.area}</p>
           </div>
         </div>
-        <span className="rounded-full bg-secondary/10 px-3 py-1 text-xs font-semibold text-secondary">
+        <span className="rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700">
           {area.status}
         </span>
       </div>
 
-      <div className="space-y-2 text-sm text-slate-600">
-        <p><span className="text-slate-500">PinCode:</span> {area.pincode}</p>
-        <p><span className="text-slate-500">Distance:</span> {area.distance ? area.distance.toFixed(2) : 'N/A'} km</p>
+      <div className="mt-4 space-y-1.5 text-sm">
+        <p className="text-slate-600"><span className="text-slate-400">PinCode:</span> {area.pincode}</p>
+        <p className="text-slate-600"><span className="text-slate-400">Distance:</span> {area.distance ? area.distance.toFixed(2) : 'N/A'} km</p>
       </div>
 
       <button
-        className="primary-btn inline-flex items-center gap-2"
+        className="mt-4 w-full primary-btn inline-flex items-center justify-center gap-2 text-sm py-2.5"
         onClick={() => handleBookNow(area.id)}
       >
-        <LuCarFront />
+        <LuCarFront className="text-base" />
         View Slots
       </button>
     </motion.article>
   );
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-rose-100 via-orange-100 to-amber-200 overflow-x-hidden">
+    <main className="min-h-screen bg-slate-50 overflow-x-hidden">
       <NavbarUser />
 
-      <section className="py-10 sm:py-16">
-        <div className="container mx-auto max-w-[1200px] px-6 lg:px-8">
+      <section className="py-8 sm:py-12">
+        <div className="container mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
           <motion.div
             variants={FadeRight(0.2)}
             initial="hidden"
             animate="visible"
-            className="rounded-3xl border border-rose-100 bg-white p-6 shadow-md sm:p-8"
+            className="rounded-2xl bg-gradient-to-r from-rose-500 to-orange-500 p-6 shadow-lg sm:p-8"
           >
             <div className="flex flex-wrap items-start justify-between gap-6">
-              <div className="space-y-4">
-                <h1 className="text-3xl font-bold text-slate-900 sm:text-4xl">Welcome back, find and book parking with clarity.</h1>
-                <p className="max-w-2xl text-slate-600">
+              <div className="space-y-3">
+                <h1 className="text-2xl font-bold text-white sm:text-3xl">Welcome back, find and book parking with clarity.</h1>
+                <p className="max-w-2xl text-white/90">
                   Search nearby parking areas, view available slots, and manage your account from one consistent interface.
                 </p>
               </div>
 
-              <div className="flex items-center gap-3 rounded-2xl border border-rose-100 bg-white p-4 shadow-sm">
-                <div className="rounded-xl bg-rose-100 p-3 text-rose-500">
+              <div className="flex items-center gap-3 rounded-xl bg-white/20 backdrop-blur-sm p-4">
+                <div className="rounded-lg bg-white/30 p-2.5 text-white">
                   <LuUsers className="text-xl" />
                 </div>
                 <div>
-                  <p className="text-sm text-slate-500">Logged in user</p>
-                  <p className="text-base font-semibold text-slate-900">{user?.firstName || user?.email || 'User account'}</p>
+                  <p className="text-sm text-white/80">Logged in as</p>
+                  <p className="text-base font-semibold text-white">{user?.firstName || user?.email || 'Customer'}</p>
                 </div>
               </div>
             </div>
@@ -200,14 +200,14 @@ const UserDashboard = () => {
 
           <ToastContainer position="top-center" />
 
-          <section className="mt-10">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="rounded-xl bg-primary/10 p-3 text-primary">
-                <LuEye className="text-xl" />
+          <section className="mt-8">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="rounded-lg bg-rose-100 p-2.5 text-rose-500">
+                <LuEye className="text-lg" />
               </div>
               <div>
-                <h2 className="text-3xl font-bold text-slate-900">Overview</h2>
-                <p className="text-slate-600">A quick summary of your parking search context.</p>
+                <h2 className="text-xl font-bold text-slate-900">Overview</h2>
+                <p className="text-sm text-slate-500">A quick summary of your parking search context.</p>
               </div>
             </div>
 
@@ -222,14 +222,14 @@ const UserDashboard = () => {
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true }}
-                    className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm"
+                    className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow"
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <div className="rounded-xl bg-primary/10 p-3 text-primary">
-                        <Icon className="text-xl" />
+                      <div className="rounded-lg bg-rose-50 p-2.5 text-rose-500">
+                        <Icon className="text-lg" />
                       </div>
                     </div>
-                    <p className="mt-4 text-2xl font-bold text-primary">{stat.value}</p>
+                    <p className="mt-3 text-2xl font-bold text-slate-900">{stat.value}</p>
                     <p className="mt-1 text-sm text-slate-500">{stat.label}</p>
                   </motion.div>
                 );
@@ -237,43 +237,43 @@ const UserDashboard = () => {
             </div>
           </section>
 
-          <section className="mt-12">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="rounded-xl bg-primary/10 p-3 text-primary">
-                <LuClock3 className="text-xl" />
+          <section className="mt-8">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="rounded-lg bg-rose-100 p-2.5 text-rose-500">
+                <LuClock3 className="text-lg" />
               </div>
               <div>
-                <h2 className="text-3xl font-bold text-slate-900">Quick Actions</h2>
-                <p className="text-slate-600">Move through the common user flows quickly.</p>
+                <h2 className="text-xl font-bold text-slate-900">Quick Actions</h2>
+                <p className="text-sm text-slate-500">Move through the common user flows quickly.</p>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-              <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm space-y-4">
-                <p className="text-xl font-bold text-slate-900">View Nearby Slots</p>
-                <p className="text-slate-600">Browse nearby parking areas and open the slots view for booking.</p>
-                <button className="primary-btn inline-flex items-center gap-2" onClick={handleRefresh}>
-                  <LuRefreshCw />
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow">
+                <p className="text-lg font-semibold text-slate-900">View Nearby Slots</p>
+                <p className="text-sm text-slate-500 mt-2">Browse nearby parking areas and open the slots view for booking.</p>
+                <button className="mt-4 primary-btn inline-flex items-center gap-2 text-sm" onClick={handleRefresh}>
+                  <LuRefreshCw className="text-base" />
                   Refresh Results
                 </button>
               </div>
 
-              <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm space-y-4">
-                <p className="text-xl font-bold text-slate-900">Update Profile</p>
-                <p className="text-slate-600">Keep your contact details and account information current.</p>
+              <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow">
+                <p className="text-lg font-semibold text-slate-900">Update Profile</p>
+                <p className="text-sm text-slate-500 mt-2">Keep your contact details and account information current.</p>
                 <button
-                  className="border border-slate-200 bg-white px-6 py-3 rounded-xl font-semibold text-slate-700 transition hover:border-primary hover:text-primary"
+                  className="mt-4 border border-slate-200 bg-white px-4 py-2 rounded-lg text-sm font-medium text-slate-700 transition hover:border-rose-500 hover:text-rose-500"
                   onClick={() => navigate('/Update')}
                 >
                   Update Profile
                 </button>
               </div>
 
-              <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm space-y-4">
-                <p className="text-xl font-bold text-slate-900">Profile</p>
-                <p className="text-slate-600">View your account information in a consistent dashboard style.</p>
+              <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow">
+                <p className="text-lg font-semibold text-slate-900">My Profile</p>
+                <p className="text-sm text-slate-500 mt-2">View your account information in a consistent dashboard style.</p>
                 <button
-                  className="border border-slate-200 bg-white px-6 py-3 rounded-xl font-semibold text-slate-700 transition hover:border-primary hover:text-primary"
+                  className="mt-4 border border-slate-200 bg-white px-4 py-2 rounded-lg text-sm font-medium text-slate-700 transition hover:border-rose-500 hover:text-rose-500"
                   onClick={() => navigate('/Profile')}
                 >
                   Open Profile
@@ -282,36 +282,36 @@ const UserDashboard = () => {
             </div>
           </section>
 
-          <section className="mt-12">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="rounded-xl bg-primary/10 p-3 text-primary">
-                <LuMapPinned className="text-xl" />
+          <section className="mt-8">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="rounded-lg bg-rose-100 p-2.5 text-rose-500">
+                <LuMapPinned className="text-lg" />
               </div>
               <div>
-                <h2 className="text-3xl font-bold text-slate-900">Recent Activity / Data</h2>
-                <p className="text-slate-600">Nearby parking areas available right now, shown in the same card structure as the rest of the app.</p>
+                <h2 className="text-xl font-bold text-slate-900">Nearby Parking Areas</h2>
+                <p className="text-sm text-slate-500">Find and book parking spots near your location.</p>
               </div>
             </div>
 
-            <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm sm:p-8">
+            <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
-                  <h3 className="text-2xl font-bold text-slate-900">Nearby Parking Areas</h3>
-                  <p className="mt-2 text-slate-600">
+                  <h3 className="text-lg font-semibold text-slate-900">Parking Near You</h3>
+                  <p className="mt-1 text-sm text-slate-500">
                     {loadingLocation
                       ? 'Locating nearby parking areas...'
-                      : locationError || `Showing parking areas near ${userLocation.lat?.toFixed(3) ?? 'your'} / ${userLocation.lng?.toFixed(3) ?? 'location'}.`}
+                      : locationError || `Showing parking areas within 3km radius.`}
                   </p>
                 </div>
                 <button
-                  className="border border-slate-200 bg-white px-6 py-3 rounded-xl font-semibold text-slate-700 transition hover:border-primary hover:text-primary"
+                  className="border border-slate-200 bg-white px-4 py-2 rounded-lg text-sm font-medium text-slate-700 transition hover:border-rose-500 hover:text-rose-500"
                   onClick={handleRefresh}
                 >
                   Refresh
                 </button>
               </div>
 
-              <div className="mt-6">
+              <div className="mt-5">
                 <ParkingMap
                   parkingAreas={parkingAreas}
                   userLocation={userLocation}
@@ -322,12 +322,12 @@ const UserDashboard = () => {
               </div>
 
               {parkingAreas.length > 0 ? (
-                <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {parkingAreas.map((area, index) => parkingCard(area, index))}
                 </div>
               ) : (
-                <div className="mt-6 rounded-2xl border border-slate-100 bg-white p-6">
-                  <p className="text-slate-600">No parking areas found.</p>
+                <div className="mt-6 rounded-lg border border-slate-200 bg-slate-50 p-5 text-center">
+                  <p className="text-slate-500">No parking areas found nearby. Try refreshing or adjusting your location.</p>
                 </div>
               )}
             </div>

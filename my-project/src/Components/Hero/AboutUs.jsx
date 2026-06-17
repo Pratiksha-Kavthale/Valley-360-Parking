@@ -118,7 +118,7 @@ const AboutUs = () => {
               viewport={{ once: true }}
               className="rounded-2xl border border-slate-100 bg-white p-6 text-center shadow-sm"
             >
-              <p className="text-2xl font-bold text-primary sm:text-3xl">{stat.value}</p>
+              <p className="text-2xl font-bold text-primary text-secondary sm:text-3xl">{stat.value}</p>
               <p className="mt-2 text-sm font-medium text-slate-500">{stat.label}</p>
             </motion.div>
           ))}

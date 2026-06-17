@@ -88,7 +88,8 @@ const AddParkingArea = () => {
         sessionStorage.setItem('parkingArea', JSON.stringify(parkArea));
 
         toast.success('Parking area added successfully!');
-        navigate('/AddParkingSlot'); // Navigate to dashboard or relevant page
+        // Pass the areaId to AddParkingSlot so it can associate the slot with this area
+        navigate('/AddParkingSlot', { state: { areaId: parkArea.id } }); 
       }
     } catch (error) {
       toast.error('Error adding parking area');

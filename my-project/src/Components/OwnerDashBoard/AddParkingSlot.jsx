@@ -16,7 +16,24 @@ const ParkingSlotForm = () => {
 
     const navigate = useNavigate();
     const location = useLocation();
-    const areaId = location.state?.areaId;
+    
+    // Get areaId from navigation state, or fallback to sessionStorage
+    const getAreaId = () => {
+        if (location.state?.areaId) {
+            return location.state.areaId;
+        }
+        const parkingArea = sessionStorage.getItem('parkingArea');
+        if (parkingArea) {
+            try {
+                return JSON.parse(parkingArea).id;
+            } catch {
+                return null;
+            }
+        }
+        return null;
+    };
+    
+    const areaId = getAreaId();
 
     const validateForm = () => {
         let isValid = true;
@@ -73,6 +90,7 @@ const ParkingSlotForm = () => {
         }
 
         try {
+            console.log('Submitting parking slot with data:', { slotNumber, price, vehicleType, status, areaId }); // Debugging form data
             const response = await api.post('http://localhost:8080/parkingSlots/Add', {
                 slotNumber,
                 price,
@@ -90,8 +108,9 @@ const ParkingSlotForm = () => {
                 console.error('Response status:', response.status);
             }
         } catch (error) {
-            toast.error('Error adding parking slot');
-            console.error('Error:', error.response ? error.response.data : error.message); // Enhanced error logging
+            const errorMessage = error.response?.data?.message || error.response?.data || error.message || 'Error adding parking slot';
+            toast.error(typeof errorMessage === 'string' ? errorMessage : 'Error adding parking slot');
+            console.error('Error:', error.response ? error.response.data : error.message);
         }
     };
 

@@ -2,7 +2,6 @@ package com.app.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -22,14 +21,17 @@ import com.app.service.ParkingAreaService;
 
 @RestController
 @RequestMapping("/parkingArea")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "${app.cors.allowed-origins:http://localhost:5173}")
 public class ParkingAreaController {
 
-	@Autowired
-	private ParkingAreaService parkingAreaService;
+	private final ParkingAreaService parkingAreaService;
+
+	public ParkingAreaController(ParkingAreaService parkingAreaService) {
+		this.parkingAreaService = parkingAreaService;
+	}
 	
 	@PostMapping("/add")
-	public ResponseEntity<?> addParkingArea(@RequestBody ParkingAreaDTO parking){
+	public ResponseEntity<ParkingArea> addParkingArea(@RequestBody ParkingAreaDTO parking){
 		
 		ParkingArea area = parkingAreaService.addParkingArea(parking);
 		return ResponseEntity.status(HttpStatus.OK).body(area);
@@ -52,19 +54,26 @@ public class ParkingAreaController {
 	}
 	
 	@PutMapping("/update/{id}")
-	public ResponseEntity<?> updateParkingArea(@PathVariable Long id, @RequestBody ParkingArea area){
-		ParkingArea parkArea = parkingAreaService.updateParkingArea(id,area);
+	public ResponseEntity<ParkingArea> updateParkingArea(@PathVariable Long id, @RequestBody ParkingAreaDTO areaDto){
+		ParkingArea area = new ParkingArea();
+		area.setArea(areaDto.getArea());
+		area.setCity(areaDto.getCity());
+		area.setPincode(areaDto.getPincode());
+		area.setLatitude(areaDto.getLatitude());
+		area.setLongitude(areaDto.getLongitude());
+		area.setStatus(areaDto.getStatus());
+		ParkingArea parkArea = parkingAreaService.updateParkingArea(id, area);
 		return ResponseEntity.ok(parkArea);
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<?> getByParkingId(@PathVariable Long id){
+	public ResponseEntity<ParkingArea> getByParkingId(@PathVariable Long id){
 		ParkingArea area = parkingAreaService.getByParkingId(id);
 		return ResponseEntity.ok(area);
 	}
 	
 	@GetMapping("/getByOwnerId/{ownerId}")
-	public ResponseEntity<?> getParkingByOwner(@PathVariable Long ownerId){
+	public ResponseEntity<List<ParkingArea>> getParkingByOwner(@PathVariable Long ownerId){
 		List<ParkingArea> parkingAreas = parkingAreaService.getParkingAreas(ownerId);
 		return ResponseEntity.ok(parkingAreas);
 	}

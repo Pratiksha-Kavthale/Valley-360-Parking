@@ -22,5 +22,5 @@ public interface BookingService {
 
 	BookingDTO extendBooking(Long bookingId, int additionalHours);
 
-	void DeleteBySlotId(Long id);
+	void deleteBySlotId(Long id);
 }

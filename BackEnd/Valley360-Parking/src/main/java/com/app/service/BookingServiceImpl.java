@@ -10,7 +10,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,34 +30,37 @@ import com.app.repository.BookingRepository;
 import com.app.repository.ParkingSlotRepository;
 import com.app.repository.ReviewRepository;
 import com.app.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @Transactional
 public class BookingServiceImpl implements BookingService {
 
-	@Autowired
-	private BookingRepository bookingRepo;
+	private static final String QR_STATUS_INVALID = "INVALID";
 
-	@Autowired
-	private UserRepository userRepo;
-
-	@Autowired
-	private ParkingSlotRepository parkingSlotRepo;
-
-	@Autowired
-	private ModelMapper mapper;
-
-	@Autowired
-	private ReviewRepository reviewRepository;
+	private final BookingRepository bookingRepo;
+	private final UserRepository userRepo;
+	private final ParkingSlotRepository parkingSlotRepo;
+	private final ModelMapper mapper;
+	private final ReviewRepository reviewRepository;
 
 	@Value("${app.payment.expiry-minutes:10}")
 	private long paymentExpiryMinutes;
 
+	public BookingServiceImpl(BookingRepository bookingRepo, UserRepository userRepo, ParkingSlotRepository parkingSlotRepo,
+			ModelMapper mapper, ReviewRepository reviewRepository) {
+		this.bookingRepo = bookingRepo;
+		this.userRepo = userRepo;
+		this.parkingSlotRepo = parkingSlotRepo;
+		this.mapper = mapper;
+		this.reviewRepository = reviewRepository;
+	}
+
 	@Override
 	public BookingDTO bookParkingSlot(BookingDTO booking) {
-		System.out.println(booking.getId());
-		System.out.println(booking.getCustomer_id());
-		System.out.println(booking.getParking_slot_id());
+		log.debug("Booking request received: bookingId={}, customerId={}, parkingSlotId={}", booking.getId(),
+				booking.getCustomer_id(), booking.getParking_slot_id());
 		User user = userRepo.findById(booking.getCustomer_id())
 				.orElseThrow(() -> new UserNotFoundException("Invalid id !!"));
 
@@ -66,7 +68,7 @@ public class BookingServiceImpl implements BookingService {
 				.orElseThrow(() -> new ParkingNotFoundException("Invalid id !!"));
 
 		Booking book = mapper.map(booking, Booking.class);
-		System.out.println(book.getId());
+		log.debug("Mapped booking entity id={}", book.getId());
 
 		LocalDateTime start = booking.getStartTime() != null ? booking.getStartTime() : booking.getArrivalDate();
 		LocalDateTime end = booking.getEndTime() != null ? booking.getEndTime() : booking.getDepartureDate();
@@ -123,48 +125,16 @@ public class BookingServiceImpl implements BookingService {
 		List<Booking> existingBookings = bookingRepo.findAllbyParkingSlotId(parkingSlotId);
 
 		List<Booking> conflicts = existingBookings.stream()
-				.filter(existing -> {
-					if (existing.getPaymentStatus() == BookingPaymentStatus.BOOKING_CANCELLED) {
-						return false;
-					}
-
-					if (existing.getPaymentExpiresAt() != null
-							&& now.isAfter(existing.getPaymentExpiresAt())
-							&& existing.getPaymentStatus() == BookingPaymentStatus.PENDING_PAYMENT) {
-						existing.setPaymentStatus(BookingPaymentStatus.BOOKING_CANCELLED);
-						existing.setStatus(BookingStatus.CANCELLED);
-						bookingRepo.save(existing);
-						return false;
-					}
-
-					LocalDateTime existingStart = existing.getStartTime() != null ? existing.getStartTime()
-							: existing.getArrivalDate();
-					LocalDateTime existingEnd = existing.getEndTime() != null ? existing.getEndTime()
-							: existing.getDepartureDate();
-
-					if (existingStart == null || existingEnd == null) {
-						return false;
-					}
-
-					if (!existingEnd.isAfter(now)) {
-						return false;
-					}
-
-					return newStartTime.isBefore(existingEnd) && newEndTime.isAfter(existingStart);
-				})
+				.filter(existing -> isConflictingBooking(existing, newStartTime, newEndTime, now))
 				.collect(Collectors.toList());
 
 		if (!conflicts.isEmpty()) {
-			Booking nearestConflict = conflicts.stream().min(Comparator.comparingLong(existing -> {
-				LocalDateTime existingStart = existing.getStartTime() != null ? existing.getStartTime()
-						: existing.getArrivalDate();
-				return Math.abs(ChronoUnit.MINUTES.between(newStartTime, existingStart));
-			})).orElse(conflicts.get(0));
+			Booking nearestConflict = conflicts.stream().min(Comparator.comparingLong(existing ->
+					Math.abs(ChronoUnit.MINUTES.between(newStartTime, getStartTime(existing)))))
+					.orElse(conflicts.get(0));
 
-			LocalDateTime conflictStart = nearestConflict.getStartTime() != null ? nearestConflict.getStartTime()
-					: nearestConflict.getArrivalDate();
-			LocalDateTime conflictEnd = nearestConflict.getEndTime() != null ? nearestConflict.getEndTime()
-					: nearestConflict.getDepartureDate();
+			LocalDateTime conflictStart = getStartTime(nearestConflict);
+			LocalDateTime conflictEnd = getEndTime(nearestConflict);
 
 			DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("hh:mm a");
 			String message = String.format(
@@ -173,6 +143,47 @@ public class BookingServiceImpl implements BookingService {
 					conflictEnd.format(timeFormatter));
 			throw new BookingConflictException(message);
 		}
+	}
+
+	private boolean isConflictingBooking(Booking existing, LocalDateTime newStartTime, LocalDateTime newEndTime,
+			LocalDateTime now) {
+		if (isCancelled(existing) || shouldCancelExpiredPending(existing, now)) {
+			return false;
+		}
+
+		LocalDateTime existingStart = getStartTime(existing);
+		LocalDateTime existingEnd = getEndTime(existing);
+
+		if (existingStart == null || existingEnd == null || !existingEnd.isAfter(now)) {
+			return false;
+		}
+
+		return newStartTime.isBefore(existingEnd) && newEndTime.isAfter(existingStart);
+	}
+
+	private boolean isCancelled(Booking existing) {
+		return existing.getPaymentStatus() == BookingPaymentStatus.BOOKING_CANCELLED;
+	}
+
+	private boolean shouldCancelExpiredPending(Booking existing, LocalDateTime now) {
+		boolean isExpiredPending = existing.getPaymentExpiresAt() != null
+				&& now.isAfter(existing.getPaymentExpiresAt())
+				&& existing.getPaymentStatus() == BookingPaymentStatus.PENDING_PAYMENT;
+		if (!isExpiredPending) {
+			return false;
+		}
+		existing.setPaymentStatus(BookingPaymentStatus.BOOKING_CANCELLED);
+		existing.setStatus(BookingStatus.CANCELLED);
+		bookingRepo.save(existing);
+		return true;
+	}
+
+	private LocalDateTime getStartTime(Booking booking) {
+		return booking.getStartTime() != null ? booking.getStartTime() : booking.getArrivalDate();
+	}
+
+	private LocalDateTime getEndTime(Booking booking) {
+		return booking.getEndTime() != null ? booking.getEndTime() : booking.getDepartureDate();
 	}
 
 	private String generateUniqueQrToken() {
@@ -186,19 +197,19 @@ public class BookingServiceImpl implements BookingService {
 	@Override
 	public QrValidationResponseDTO validateQrToken(String qrToken) {
 		if (qrToken == null || qrToken.trim().isEmpty()) {
-			return new QrValidationResponseDTO("INVALID", "QR token is required.", null);
+			return new QrValidationResponseDTO(QR_STATUS_INVALID, "QR token is required.", null);
 		}
 
 		Booking booking = bookingRepo.findByQrToken(qrToken)
 				.orElse(null);
 
 		if (booking == null) {
-			return new QrValidationResponseDTO("INVALID", "QR token not found.", null);
+			return new QrValidationResponseDTO(QR_STATUS_INVALID, "QR token not found.", null);
 		}
 
 		if (booking.getPaymentStatus() != null
 				&& booking.getPaymentStatus() != BookingPaymentStatus.BOOKING_CONFIRMED) {
-			return new QrValidationResponseDTO("INVALID", "Booking payment is not confirmed yet.", booking.getId());
+			return new QrValidationResponseDTO(QR_STATUS_INVALID, "Booking payment is not confirmed yet.", booking.getId());
 		}
 
 		LocalDateTime now = LocalDateTime.now();
@@ -212,7 +223,7 @@ public class BookingServiceImpl implements BookingService {
 		}
 
 		if (booking.getStatus() == BookingStatus.USED) {
-			return new QrValidationResponseDTO("INVALID", "QR already used.", booking.getId());
+			return new QrValidationResponseDTO(QR_STATUS_INVALID, "QR already used.", booking.getId());
 		}
 
 		if (booking.getStatus() == BookingStatus.EXPIRED) {
@@ -220,7 +231,7 @@ public class BookingServiceImpl implements BookingService {
 		}
 
 		if (booking.getArrivalDate() != null && now.isBefore(booking.getArrivalDate())) {
-			return new QrValidationResponseDTO("INVALID", "Booking window has not started yet.", booking.getId());
+			return new QrValidationResponseDTO(QR_STATUS_INVALID, "Booking window has not started yet.", booking.getId());
 		}
 
 		booking.setStatus(BookingStatus.USED);
@@ -230,18 +241,9 @@ public class BookingServiceImpl implements BookingService {
 
 	@Override
 	public List<Booking> viewBookingHistory(Long id) {
-		bookingRepo.findById(id);
-		return null;
+		return bookingRepo.findAllbyParkingSlotId(id);
 	}
 
-	// @Override
-	// public List<BookingDTO> getTodaysBookings(Long ownerId) {
-	// LocalDate today = LocalDate.now();
-	// List<Booking> bookings = bookingRepo.findTodaysBookingsByOwnerId(ownerId,
-	// today);
-	// return bookings.stream().map(book -> mapper.map(book, BookingDTO.class))
-	// .collect(Collectors.toList());
-	// }
 	@Override
 	public List<BookingDTO> getTodaysBookings(Long ownerId) {
 		LocalDate today = LocalDate.now();
@@ -259,8 +261,6 @@ public class BookingServiceImpl implements BookingService {
 	public List<BookingDTO> getPreviousBookings(Long ownerId) {
 		LocalDateTime today = LocalDateTime.now();
 		List<Booking> bookings = bookingRepo.findPreviousBookingsByOwnerId(ownerId, today);
-		// return bookings.stream().map(book -> mapper.map(book, BookingDTO.class))
-		// .collect(Collectors.toList());
 
 		return bookings.stream().map(book -> {
 			BookingDTO dto = mapper.map(book, BookingDTO.class);
@@ -402,9 +402,7 @@ public class BookingServiceImpl implements BookingService {
 			return booking.getStatus().name();
 		}
 
-		System.out.println("NOW: " + now);
-		System.out.println("START: " + start);
-		System.out.println("END: " + end);
+		log.debug("Booking status context: now={}, start={}, end={}", now, start, end);
 
 		if (start != null && now.isBefore(start))
 			return "RESERVED";
@@ -415,14 +413,14 @@ public class BookingServiceImpl implements BookingService {
 
 	@Transactional
 	@Override
-	public void DeleteBySlotId(Long id) {
+	public void deleteBySlotId(Long id) {
 
 		List<Booking> b = bookingRepo.findAllbyParkingSlotId(id);
 		if (b != null) {
 			for (Booking booking : b) {
-				System.out.println("sdfghjklwertyuiopiwertyuiop");
+				log.debug("Deleting booking by parking slot mapping for bookingId={}", booking.getId());
 				bookingRepo.deleteBookingsByParkingSlotId(booking.getId());
-				System.out.println("Sussefully deleted");
+				log.debug("Deleted bookingId={}", booking.getId());
 			}
 		}
 

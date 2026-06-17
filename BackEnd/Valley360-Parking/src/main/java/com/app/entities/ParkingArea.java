@@ -13,9 +13,6 @@ import javax.persistence.Table;
 
 import com.app.enums.Status;
 
-import lombok.Getter;
-import lombok.Setter;
-
 @Entity
 // @Getter
 // @Setter
@@ -122,14 +119,6 @@ public class ParkingArea extends BaseEntity {
 
 	public void setUser(User user) {
 		this.user = user;
-	}
-
-	public User getOwner() {
-		return user;
-	}
-
-	public void setOwner(User owner) {
-		this.user = owner;
 	}
 
 	public Set<ParkingSlot> getParkingSlots() {

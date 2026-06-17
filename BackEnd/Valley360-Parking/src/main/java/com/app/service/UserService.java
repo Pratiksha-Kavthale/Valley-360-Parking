@@ -17,7 +17,7 @@ public interface UserService {
 	User getById(long id);
 	long countAllOwners();
 	long countAllCustomers();
-	List<User> GetAllOwner();
-	List<User> GetAllCustomers();
-	String Delete(Long id);
+	List<User> getAllOwners();
+	List<User> getAllCustomers();
+	String delete(Long id);
 }

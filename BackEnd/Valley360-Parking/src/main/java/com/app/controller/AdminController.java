@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -36,33 +35,32 @@ import com.app.service.ParkingSlotService;
 import com.app.service.UserService;
 
 @RestController
-@RequestMapping({ "/Admin", "/admin" })
-@CrossOrigin(origins = "*")
+@RequestMapping("/Admin")
+@CrossOrigin(origins = "${app.cors.allowed-origins:http://localhost:5173}")
+@SuppressWarnings("java:S107")
 public class AdminController {
 
-	@Autowired
-	UserService userService;
+	private final UserService userService;
+	private final AdminService admin;
+	private final ParkingSlotService parkingSlotService;
+	private final ParkingAreaService parkingAreaService;
+	private final AuthenticationManager authManager;
+	private final JWTUtils jwtUtils;
+	private final OwnerScoreService ownerScoreService;
+	private final BookingPaymentService bookingPaymentService;
 
-	@Autowired
-	private AdminService admin;
-
-	@Autowired
-	private ParkingSlotService parkingSlotService;
-
-	@Autowired
-	private ParkingAreaService parkingAreaService;
-
-	@Autowired
-	private AuthenticationManager authManager;
-
-	@Autowired
-	private JWTUtils jwtUtils;
-
-	@Autowired
-	private OwnerScoreService ownerScoreService;
-
-	@Autowired
-	private BookingPaymentService bookingPaymentService;
+	public AdminController(UserService userService, AdminService admin, ParkingSlotService parkingSlotService,
+			ParkingAreaService parkingAreaService, AuthenticationManager authManager, JWTUtils jwtUtils,
+			OwnerScoreService ownerScoreService, BookingPaymentService bookingPaymentService) {
+		this.userService = userService;
+		this.admin = admin;
+		this.parkingSlotService = parkingSlotService;
+		this.parkingAreaService = parkingAreaService;
+		this.authManager = authManager;
+		this.jwtUtils = jwtUtils;
+		this.ownerScoreService = ownerScoreService;
+		this.bookingPaymentService = bookingPaymentService;
+	}
 
 	@GetMapping("/findByRole")
 	public ResponseEntity<List<UserDTO>> findByRole(@RequestParam String role) {
@@ -73,7 +71,7 @@ public class AdminController {
 	@GetMapping("/dashboard")
 	public ResponseEntity<Map<String, Long>> getDashboardData() {
 
-		Map<String, Long> data = new HashMap<String, Long>();
+		Map<String, Long> data = new HashMap<>();
 		data.put("parkingSlots", parkingSlotService.countAllSlots());
 		data.put("parkingAreas", parkingAreaService.countAllAreas());
 		data.put("owners", userService.countAllOwners());
@@ -81,8 +79,8 @@ public class AdminController {
 		return ResponseEntity.ok(data);
 	}
 
-	@PostMapping({ "/Login", "/login" })
-	public ResponseEntity<?> login(@RequestParam String email, @RequestParam String password) {
+	@PostMapping("/Login")
+	public ResponseEntity<Map<String, Object>> login(@RequestParam String email, @RequestParam String password) {
 		User adminUser = admin.login(email, password);
 
 		UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email, password);
@@ -92,18 +90,32 @@ public class AdminController {
 				.map(GrantedAuthority::getAuthority)
 				.collect(Collectors.toSet());
 
-		Map<String, Object> userPayload = new HashMap<String, Object>();
+		Map<String, Object> userPayload = new HashMap<>();
 		userPayload.put("id", adminUser.getId());
 		userPayload.put("email", adminUser.getEmail());
 		userPayload.put("firstName", adminUser.getFirstName());
 		userPayload.put("lastName", adminUser.getLastName());
 		userPayload.put("userRoles", roleList);
 
-		Map<String, Object> response = new HashMap<String, Object>();
+		Map<String, Object> response = new HashMap<>();
 		response.put("token", jwtUtils.generateJwtToken(authenticationDetails));
 		response.put("user", userPayload);
 
 		return ResponseEntity.ok(response);
+	}
+
+	@PostMapping("/Register")
+	public ResponseEntity<Map<String, Object>> registerAdmin(
+			@RequestBody UserDTO userDTO,
+			@RequestParam String employeeId) {
+		// Employee ID is verified but NOT stored
+		admin.registerAdmin(userDTO, employeeId);
+		
+		Map<String, Object> response = new HashMap<>();
+		response.put("message", "Admin registered successfully");
+		response.put("email", userDTO.getEmail());
+		
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
 	@GetMapping("/owners-risk")

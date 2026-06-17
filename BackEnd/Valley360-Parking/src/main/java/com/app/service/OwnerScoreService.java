@@ -10,7 +10,6 @@ import com.app.repository.OwnerMetricsRepository;
 import com.app.repository.ReviewRepository;
 import com.app.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,14 +30,21 @@ import java.util.stream.Collectors;
 @Transactional
 public class OwnerScoreService {
 
-    @Autowired
-    private OwnerMetricsRepository ownerMetricsRepository;
+    private static final String SENTIMENT_NEGATIVE = "NEGATIVE";
+    private static final String RISK_NO_DATA = "NO DATA";
+    private static final String TREND_STABLE = "Stable";
+    private static final String TREND_WORSENING = "Worsening";
 
-    @Autowired
-    private ReviewRepository reviewRepository;
+    private final OwnerMetricsRepository ownerMetricsRepository;
+    private final ReviewRepository reviewRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    public OwnerScoreService(OwnerMetricsRepository ownerMetricsRepository, ReviewRepository reviewRepository,
+            UserRepository userRepository) {
+        this.ownerMetricsRepository = ownerMetricsRepository;
+        this.reviewRepository = reviewRepository;
+        this.userRepository = userRepository;
+    }
 
     /**
      * Recalculate owner trust score based on reviews
@@ -90,7 +96,7 @@ public class OwnerScoreService {
                 // Aggregate sentiment
                 if ("POSITIVE".equals(review.getSentimentLabel())) {
                     positiveCount++;
-                } else if ("NEGATIVE".equals(review.getSentimentLabel())) {
+                } else if (SENTIMENT_NEGATIVE.equals(review.getSentimentLabel())) {
                     negativeCount++;
                 } else {
                     neutralCount++;
@@ -239,11 +245,11 @@ public class OwnerScoreService {
                                 .ownerId(owner.getId())
                                 .ownerName(ownerName)
                                 .trustScore(0.0)
-                                .riskLevel("NO DATA")
+                                .riskLevel(RISK_NO_DATA)
                                 .totalReviews(0)
                                 .negativePercent(0.0)
                                 .securityComplaints(0)
-                                .trend("Stable")
+                                .trend(TREND_STABLE)
                                 .suggestedAction("Collect More Reviews")
                                 .build();
                     }
@@ -293,67 +299,20 @@ public class OwnerScoreService {
     public AdminReviewAnalyticsResponse getPlatformReviewAnalytics() {
         List<Review> allReviews = reviewRepository.findAll();
         if (allReviews.isEmpty()) {
-            return AdminReviewAnalyticsResponse.builder()
-                    .totalReviews(0)
-                    .positivePercent(0.0)
-                    .negativePercent(0.0)
-                    .neutralPercent(0.0)
-                    .avgRating(0.0)
-                    .topComplaints(new ArrayList<>())
-                    .build();
+            return emptyReviewAnalytics();
         }
 
         double avgRating = allReviews.stream().mapToInt(Review::getRating).average().orElse(0.0);
 
         List<Review> analyzedReviews = reviewRepository.findByAiProcessedTrue();
-        int analyzedTotal = analyzedReviews.size();
-        int positiveCount = 0;
-        int negativeCount = 0;
-        int neutralCount = 0;
+        int[] sentimentCounts = resolveSentimentCounts(analyzedReviews, allReviews);
+        int analyzedTotal = resolveAnalyzedTotal(analyzedReviews, allReviews);
 
-        if (analyzedTotal > 0) {
-            for (Review review : analyzedReviews) {
-                if ("POSITIVE".equalsIgnoreCase(review.getSentimentLabel())) {
-                    positiveCount++;
-                } else if ("NEGATIVE".equalsIgnoreCase(review.getSentimentLabel())) {
-                    negativeCount++;
-                } else {
-                    neutralCount++;
-                }
-            }
-        } else {
-            for (Review review : allReviews) {
-                if (review.getRating() >= 4) {
-                    positiveCount++;
-                } else if (review.getRating() <= 2) {
-                    negativeCount++;
-                } else {
-                    neutralCount++;
-                }
-            }
-            analyzedTotal = allReviews.size();
-        }
+        double positivePercent = percentage(sentimentCounts[0], analyzedTotal);
+        double negativePercent = percentage(sentimentCounts[1], analyzedTotal);
+        double neutralPercent = percentage(sentimentCounts[2], analyzedTotal);
 
-        double positivePercent = analyzedTotal > 0 ? (positiveCount * 100.0) / analyzedTotal : 0.0;
-        double negativePercent = analyzedTotal > 0 ? (negativeCount * 100.0) / analyzedTotal : 0.0;
-        double neutralPercent = analyzedTotal > 0 ? (neutralCount * 100.0) / analyzedTotal : 0.0;
-
-        Map<String, Integer> complaintCounts = new HashMap<>();
-        int securityFlags = (int) analyzedReviews.stream().filter(r -> Boolean.TRUE.equals(r.getSecurityFlag()))
-                .count();
-        int cleanlinessFlags = (int) analyzedReviews.stream().filter(r -> Boolean.TRUE.equals(r.getCleanlinessFlag()))
-                .count();
-        if (securityFlags > 0) {
-            complaintCounts.put("security", securityFlags);
-        }
-        if (cleanlinessFlags > 0) {
-            complaintCounts.put("cleanliness", cleanlinessFlags);
-        }
-
-        int lowRatingCount = (int) allReviews.stream().filter(r -> r.getRating() <= 2).count();
-        if (lowRatingCount > 0) {
-            complaintCounts.put("low-rating", lowRatingCount);
-        }
+        Map<String, Integer> complaintCounts = buildComplaintCounts(analyzedReviews, allReviews);
 
         List<String> topComplaints = complaintCounts.entrySet().stream()
                 .sorted(Map.Entry.<String, Integer>comparingByValue(Comparator.reverseOrder()))
@@ -371,6 +330,74 @@ public class OwnerScoreService {
                 .build();
     }
 
+    private AdminReviewAnalyticsResponse emptyReviewAnalytics() {
+        return AdminReviewAnalyticsResponse.builder()
+                .totalReviews(0)
+                .positivePercent(0.0)
+                .negativePercent(0.0)
+                .neutralPercent(0.0)
+                .avgRating(0.0)
+                .topComplaints(new ArrayList<>())
+                .build();
+    }
+
+    private int[] resolveSentimentCounts(List<Review> analyzedReviews, List<Review> allReviews) {
+        int positiveCount = 0;
+        int negativeCount = 0;
+        int neutralCount = 0;
+
+        List<Review> source = analyzedReviews.isEmpty() ? allReviews : analyzedReviews;
+        for (Review review : source) {
+            if (analyzedReviews.isEmpty()) {
+                if (review.getRating() >= 4) {
+                    positiveCount++;
+                } else if (review.getRating() <= 2) {
+                    negativeCount++;
+                } else {
+                    neutralCount++;
+                }
+            } else if ("POSITIVE".equalsIgnoreCase(review.getSentimentLabel())) {
+                positiveCount++;
+            } else if (SENTIMENT_NEGATIVE.equalsIgnoreCase(review.getSentimentLabel())) {
+                negativeCount++;
+            } else {
+                neutralCount++;
+            }
+        }
+
+        return new int[] { positiveCount, negativeCount, neutralCount };
+    }
+
+    private int resolveAnalyzedTotal(List<Review> analyzedReviews, List<Review> allReviews) {
+        return analyzedReviews.isEmpty() ? allReviews.size() : analyzedReviews.size();
+    }
+
+    private double percentage(int count, int total) {
+        return total > 0 ? (count * 100.0) / total : 0.0;
+    }
+
+    private Map<String, Integer> buildComplaintCounts(List<Review> analyzedReviews, List<Review> allReviews) {
+        Map<String, Integer> complaintCounts = new HashMap<>();
+
+        int securityFlags = (int) analyzedReviews.stream().filter(r -> Boolean.TRUE.equals(r.getSecurityFlag()))
+                .count();
+        int cleanlinessFlags = (int) analyzedReviews.stream().filter(r -> Boolean.TRUE.equals(r.getCleanlinessFlag()))
+                .count();
+        int lowRatingCount = (int) allReviews.stream().filter(r -> r.getRating() <= 2).count();
+
+        if (securityFlags > 0) {
+            complaintCounts.put("security", securityFlags);
+        }
+        if (cleanlinessFlags > 0) {
+            complaintCounts.put("cleanliness", cleanlinessFlags);
+        }
+        if (lowRatingCount > 0) {
+            complaintCounts.put("low-rating", lowRatingCount);
+        }
+
+        return complaintCounts;
+    }
+
     private String resolveOwnerName(User owner) {
         String firstName = owner.getFirstName() != null ? owner.getFirstName().trim() : "";
         String lastName = owner.getLastName() != null ? owner.getLastName().trim() : "";
@@ -384,7 +411,7 @@ public class OwnerScoreService {
     private int countNegativeReviews(List<Review> reviews) {
         int negativeCount = 0;
         for (Review review : reviews) {
-            if ("NEGATIVE".equalsIgnoreCase(review.getSentimentLabel()) || review.getRating() <= 2) {
+            if (SENTIMENT_NEGATIVE.equalsIgnoreCase(review.getSentimentLabel()) || review.getRating() <= 2) {
                 negativeCount++;
             }
         }
@@ -395,7 +422,7 @@ public class OwnerScoreService {
         int repeated = 0;
         int streak = 0;
         for (Review review : reviews) {
-            boolean bad = "NEGATIVE".equalsIgnoreCase(review.getSentimentLabel())
+            boolean bad = SENTIMENT_NEGATIVE.equalsIgnoreCase(review.getSentimentLabel())
                     || Boolean.TRUE.equals(review.getSecurityFlag())
                     || Boolean.TRUE.equals(review.getCleanlinessFlag())
                     || review.getRating() <= 2;
@@ -413,7 +440,7 @@ public class OwnerScoreService {
 
     private String detectTrend(List<Review> reviews) {
         if (reviews.size() < 4) {
-            return "Stable";
+            return TREND_STABLE;
         }
 
         int split = reviews.size() / 2;
@@ -430,9 +457,9 @@ public class OwnerScoreService {
             return "Improving";
         }
         if (recentAvg <= previousAvg - 0.5 || recentNeg >= prevNeg + 10.0) {
-            return "Worsening";
+            return TREND_WORSENING;
         }
-        return "Stable";
+        return TREND_STABLE;
     }
 
     private double calculateDynamicTrustScore(
@@ -456,14 +483,14 @@ public class OwnerScoreService {
         score -= cleanlinessComplaints * 2.0;
         score -= repeatedBadComplaints * 3.0;
 
-        if ("Worsening".equals(trend)) {
+        if (TREND_WORSENING.equals(trend)) {
             score -= 8.0;
         } else if ("Improving".equals(trend)) {
             score += 4.0;
         }
 
         long goodRecentReviews = reviews.stream().limit(5)
-                .filter(r -> r.getRating() >= 4 && !"NEGATIVE".equalsIgnoreCase(r.getSentimentLabel()))
+                .filter(r -> r.getRating() >= 4 && !SENTIMENT_NEGATIVE.equalsIgnoreCase(r.getSentimentLabel()))
                 .count();
         score += goodRecentReviews * 1.5;
 
@@ -472,7 +499,7 @@ public class OwnerScoreService {
 
     private String resolveRiskLevel(double trustScore, int totalReviews) {
         if (totalReviews == 0) {
-            return "NO DATA";
+            return RISK_NO_DATA;
         }
         if (trustScore >= 80.0) {
             return "SAFE";
@@ -487,7 +514,7 @@ public class OwnerScoreService {
     }
 
     private String resolveSuggestedAction(String riskLevel, String trend, int securityComplaints) {
-        if ("NO DATA".equals(riskLevel)) {
+        if (RISK_NO_DATA.equals(riskLevel)) {
             return "Collect More Reviews";
         }
         if ("CRITICAL".equals(riskLevel)) {
@@ -497,7 +524,7 @@ public class OwnerScoreService {
             return "Warn Owner";
         }
         if ("WARNING".equals(riskLevel)) {
-            return "Worsening".equals(trend) || securityComplaints >= 2 ? "Warn Owner" : "Monitor Closely";
+            return TREND_WORSENING.equals(trend) || securityComplaints >= 2 ? "Warn Owner" : "Monitor Closely";
         }
         return "None";
     }

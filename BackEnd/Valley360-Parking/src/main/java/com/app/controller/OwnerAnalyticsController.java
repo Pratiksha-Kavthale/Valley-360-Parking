@@ -4,7 +4,6 @@ import com.app.dto.OwnerMetricsResponse;
 import com.app.entities.OwnerMetrics;
 import com.app.service.OwnerScoreService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,15 +22,17 @@ import java.time.LocalDateTime;
 @Slf4j
 @RestController
 @RequestMapping("/owner/analytics")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "${app.cors.allowed-origins:http://localhost:5173}")
 @PreAuthorize("hasRole('OWNER')")
 public class OwnerAnalyticsController {
 
-    @Autowired
-    private OwnerScoreService ownerScoreService;
+    private final OwnerScoreService ownerScoreService;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    public OwnerAnalyticsController(OwnerScoreService ownerScoreService, UserRepository userRepository) {
+        this.ownerScoreService = ownerScoreService;
+        this.userRepository = userRepository;
+    }
 
     /**
      * Get authenticated owner's trust score and metrics
@@ -40,7 +41,7 @@ public class OwnerAnalyticsController {
      * GET /owner/analytics/my-metrics
      */
     @GetMapping("/my-metrics")
-    public ResponseEntity<?> getMyMetrics() {
+    public ResponseEntity<Object> getMyMetrics() {
         try {
             Long ownerId = getAuthenticatedOwnerId();
             log.info("Fetching metrics for owner: {}", ownerId);
@@ -67,7 +68,7 @@ public class OwnerAnalyticsController {
      * Includes sentiment breakdown, recent complaints, etc.
      */
     @GetMapping("/summary")
-    public ResponseEntity<?> getAnalyticsSummary() {
+    public ResponseEntity<Object> getAnalyticsSummary() {
         try {
             Long ownerId = getAuthenticatedOwnerId();
             log.info("Fetching analytics summary for owner: {}", ownerId);
@@ -105,7 +106,7 @@ public class OwnerAnalyticsController {
      * Manually trigger recalculation of owner's trust score
      */
     @PostMapping("/recalculate")
-    public ResponseEntity<?> recalculateMyScore() {
+    public ResponseEntity<Object> recalculateMyScore() {
         try {
             Long ownerId = getAuthenticatedOwnerId();
             log.info("Owner {} triggered manual score recalculation", ownerId);

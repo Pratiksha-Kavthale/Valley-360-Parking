@@ -2,7 +2,6 @@ package com.app.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -19,15 +18,18 @@ import com.app.service.ParkingSlotService;
 
 @RestController
 @RequestMapping("/parkingSlots")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "${app.cors.allowed-origins:http://localhost:5173}")
 public class ParkingSlotController {
 
-	@Autowired
-	private ParkingSlotService parkingSlotService;
+	private final ParkingSlotService parkingSlotService;
+
+	public ParkingSlotController(ParkingSlotService parkingSlotService) {
+		this.parkingSlotService = parkingSlotService;
+	}
 	
 	@PostMapping("/Add")
-	public ResponseEntity<?> addParkingSlot(@RequestBody ParkingSlotDTO parkingSlot){
-		
+	public ResponseEntity<String> addParkingSlot(@RequestBody ParkingSlotDTO parkingSlot){
+		System.out.println("in parkingslot");
 		parkingSlotService.addNewParkingSlot(parkingSlot);
 		return ResponseEntity.status(HttpStatus.OK).body("Parking slot added !!");
 	}
@@ -40,8 +42,8 @@ public class ParkingSlotController {
 	
 	@GetMapping("/GetAllParkingSlots")
 	public ResponseEntity<List<ParkingSlotDTO>> getAllParkingSlots(){
-		List<ParkingSlotDTO> Slots=parkingSlotService.getParkingSlots();
-		return ResponseEntity.ok(Slots);
+		List<ParkingSlotDTO> slots = parkingSlotService.getParkingSlots();
+		return ResponseEntity.ok(slots);
 	}
 	
 	@GetMapping("/sortBy")
