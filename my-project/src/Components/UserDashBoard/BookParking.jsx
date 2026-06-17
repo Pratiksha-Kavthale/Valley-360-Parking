@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import api from '/src/api';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import NavbarUser from './NavbarUser';
 
 const BookParking = () => {
   const { slotId } = useParams();
@@ -112,8 +111,6 @@ const BookParking = () => {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <NavbarUser />
-
       <main className="max-w-2xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-6">

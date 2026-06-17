@@ -1,9 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { toast, ToastContainer } from 'react-toastify';
 import api from '/src/api';
-import NavbarOwner from './NavbarOwner';
 import Footer from '../Footer/Footer';
 
 const statusClass = {
@@ -59,7 +58,6 @@ const OwnerSlotTimeline = () => {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-rose-100 via-orange-100 to-amber-200 overflow-x-hidden">
-      <NavbarOwner />
       <section className="py-10 sm:py-16">
         <div className="container mx-auto max-w-[1200px] px-6 lg:px-8">
           <div className="rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-sm sm:p-8">

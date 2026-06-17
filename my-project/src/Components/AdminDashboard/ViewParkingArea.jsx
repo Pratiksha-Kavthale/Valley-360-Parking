@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import api from '/src/api';
 
 const ViewParkingArea = () => {
@@ -25,7 +25,7 @@ const ViewParkingArea = () => {
   
 const handleDelete = async (id) => {
   try {
-   const msg= await api.delete(`http://localhost:8080/Admin/deleteParkignArea/${id}`);
+   await api.delete(`http://localhost:8080/Admin/deleteParkignArea/${id}`);
     setParkingAreas((prevAreas) => prevAreas.filter((area) => area.id !== id));
   } catch (error) {
     console.error('Error deleting parking area:', error);

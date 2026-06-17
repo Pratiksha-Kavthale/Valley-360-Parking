@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import api from '/src/api';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useNavigate } from 'react-router-dom';
 
 const OwnersList = () => {
-  const navigate = useNavigate();
   const [owners, setOwners] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -28,7 +26,7 @@ const OwnersList = () => {
   const handleDelete = async (id) => {
     try {
       console.log({id})
-      const response=await api.delete(`http://localhost:8080/Admin/Delete/${id}`);
+      await api.delete(`http://localhost:8080/Admin/Delete/${id}`);
       toast.success('User deleted successfully');
       // Refresh the list after deletion
       fetchOwners();

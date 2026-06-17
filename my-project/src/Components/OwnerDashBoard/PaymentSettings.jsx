@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import api from '/src/api';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Navbar from './NavbarOwner';
 import Footer from '../Footer/Footer';
 
 const initialForm = {
@@ -64,7 +63,6 @@ const PaymentSettings = () => {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-rose-100 via-orange-100 to-amber-200 text-slate-800 overflow-x-hidden">
-      <Navbar />
       <ToastContainer position="top-center" />
       <section className="py-10 sm:py-16">
         <div className="container mx-auto max-w-3xl px-6 lg:px-8">

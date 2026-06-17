@@ -38,9 +38,12 @@ public class ParkingAreaController {
 	}
 	
 	@GetMapping("/nearby")
-    public ResponseEntity<List<ParkingAreaDTO>> findNearbyParking(@RequestParam double latitude,@RequestParam double longitude) {
+    public ResponseEntity<List<ParkingAreaDTO>> findNearbyParking(
+            @RequestParam double latitude,
+            @RequestParam double longitude,
+            @RequestParam(required = false, defaultValue = "5.0") double radiusKm) {
         
-        List<ParkingAreaDTO> nearbyParkingAreas = parkingAreaService.findNearbyParking(latitude, longitude, 3.0);
+        List<ParkingAreaDTO> nearbyParkingAreas = parkingAreaService.findNearbyParking(latitude, longitude, radiusKm);
         return ResponseEntity.ok(nearbyParkingAreas);
     }
 	

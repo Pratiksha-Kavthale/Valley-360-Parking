@@ -2,6 +2,7 @@ package com.app.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -136,6 +137,36 @@ public class OwnerViewServiceImpl implements OwnerViewService {
         dto.setLongitude(area.getLongitude());
         dto.setStatus(area.getStatus());
         dto.setOwnerId(area.getUser() != null ? area.getUser().getId() : null);
+        dto.setAvgRating(area.getAvgRating());
+        dto.setTotalReviews(area.getTotalReviews());
+        
+        // Calculate slot stats
+        Set<ParkingSlot> slots = area.getParkingSlots();
+        if (slots != null && !slots.isEmpty()) {
+            dto.setTotalSlots(slots.size());
+            long availableCount = slots.stream()
+                .filter(slot -> slot.getStatus() == com.app.enums.Status.AVAILABLE)
+                .count();
+            dto.setAvailableSlots((int) availableCount);
+            
+            // Calculate price range
+            double minPrice = slots.stream()
+                .mapToDouble(ParkingSlot::getPrice)
+                .min()
+                .orElse(0);
+            double maxPrice = slots.stream()
+                .mapToDouble(ParkingSlot::getPrice)
+                .max()
+                .orElse(0);
+            dto.setPriceMin(minPrice);
+            dto.setPriceMax(maxPrice);
+        } else {
+            dto.setTotalSlots(0);
+            dto.setAvailableSlots(0);
+            dto.setPriceMin(0.0);
+            dto.setPriceMax(0.0);
+        }
+        
         return dto;
     }
 

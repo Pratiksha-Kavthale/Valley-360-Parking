@@ -1,4 +1,3 @@
-import React from 'react';
 import PaymentReviewPanel from '../Payments/PaymentReviewPanel';
 
 const PaymentReview = () => {

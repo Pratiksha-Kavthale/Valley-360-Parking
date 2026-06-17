@@ -1,10 +1,7 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { LuCar , LuShieldCheck, LuMapPinned, LuClock3 } from 'react-icons/lu';
-import Navbar from '../Navbar';
 import Footer from '../Footer/Footer';
 import HeroImage from '../../Images/Bg-clg.jpg';
-import BannerImage from '../../Images/Parking-Banner.png';
 import { FadeUp, FadeRight } from '../../utility/annimation';
 
 const stats = [
@@ -37,7 +34,6 @@ const AboutUs = () => {
   console.log("AboutUs rendered");
   return (
     <main className="overflow-x-hidden bg-white">
-      <Navbar />
 
       <section className="relative isolate overflow-hidden py-16 sm:py-20">
         <div className="absolute inset-0 -z-10 bg-gradient-to-b from-primary/10 via-white to-secondary/10" />
@@ -50,9 +46,9 @@ const AboutUs = () => {
               variants={FadeUp(0.2)}
               initial="hidden"
               animate="visible"
-              className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-white px-4 py-2 text-sm font-semibold text-primary shadow-sm"
+              className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-rose-500 px-4 py-2 text-sm font-semibold text-primary shadow-sm"
             >
-              <LuCar  className="text-secondary" />
+              <LuCar  className="text-rose-600" />
               About Valley360 Parking
             </motion.div>
 

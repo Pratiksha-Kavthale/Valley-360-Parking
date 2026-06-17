@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import api from '/src/api';
 
@@ -65,7 +65,7 @@ const ParkingReviews = ({ parkingId }) => {
 
         setSummary(summaryResponse.data || {});
         setReviews(Array.isArray(reviewResponse.data) ? reviewResponse.data : []);
-      } catch (error) {
+      } catch {
         setSummary({
           avgRating: 0,
           avgCleanliness: 0,

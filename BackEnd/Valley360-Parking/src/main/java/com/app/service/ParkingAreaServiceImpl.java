@@ -68,13 +68,50 @@ public class ParkingAreaServiceImpl implements ParkingAreaService {
 	    List<ParkingArea> allParkingAreas = parkingAreaRepository.findAll();
 
 	    return allParkingAreas.stream()
-	            .filter(parkingArea -> {
+	            .map(parkingArea -> {
 	                double distance = calculateDistance(currentLatitude, currentLongitude,
 	                        parkingArea.getLatitude(), parkingArea.getLongitude());
-	                return distance <= radiusInKm;
+	                return new Object[] { parkingArea, distance };
 	            })
-	            .map(this::convertToDTO)
+	            .filter(obj -> (double) obj[1] <= radiusInKm)
+	            .map(obj -> convertToDTOWithDetails((ParkingArea) obj[0], (double) obj[1]))
 	            .collect(Collectors.toList());
+	}
+
+	private ParkingAreaDTO convertToDTOWithDetails(ParkingArea parkingArea, double distance) {
+		ParkingAreaDTO dto = mapper.map(parkingArea, ParkingAreaDTO.class);
+		
+		// Set distance
+		dto.setDistance(distance);
+		
+		// Calculate slots info
+		Set<ParkingSlot> slots = parkingArea.getParkingSlots();
+		if (slots != null && !slots.isEmpty()) {
+			dto.setTotalSlots(slots.size());
+			long availableCount = slots.stream()
+				.filter(slot -> slot.getStatus() == Status.AVAILABLE)
+				.count();
+			dto.setAvailableSlots((int) availableCount);
+			
+			// Calculate price range
+			double minPrice = slots.stream()
+				.mapToDouble(ParkingSlot::getPrice)
+				.min()
+				.orElse(0);
+			double maxPrice = slots.stream()
+				.mapToDouble(ParkingSlot::getPrice)
+				.max()
+				.orElse(0);
+			dto.setPriceMin(minPrice);
+			dto.setPriceMax(maxPrice);
+		} else {
+			dto.setTotalSlots(0);
+			dto.setAvailableSlots(0);
+			dto.setPriceMin(0.0);
+			dto.setPriceMax(0.0);
+		}
+		
+		return dto;
 	}
 
 	private ParkingAreaDTO convertToDTO(ParkingArea parkingArea) {

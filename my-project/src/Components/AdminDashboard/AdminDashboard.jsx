@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '/src/api';
 
@@ -69,6 +69,41 @@ const AdminDashboard = () => {
                         <div className="text-xs uppercase tracking-wide opacity-90">Payments</div>
                         <div className="text-xl font-bold mt-1">Payment Review Queue</div>
                         <p className="mt-2 text-sm text-white/90">Verify submitted payment proofs and resolve booking confirmations.</p>
+                    </button>
+                </div>
+            </div>
+
+            <div className="mt-8">
+                <h2 className="text-xl font-semibold mb-4 text-slate-900">Platform Operations</h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <button
+                        type="button"
+                        onClick={() => navigate('/admin/cleanup-review')}
+                        className="text-left bg-gradient-to-br from-amber-500 to-orange-600 text-white rounded-xl p-5 shadow-md hover:shadow-lg hover:scale-[1.01] transition"
+                    >
+                        <div className="text-xs uppercase tracking-wide opacity-90">Maintenance</div>
+                        <div className="text-xl font-bold mt-1">Cleanup Review</div>
+                        <p className="mt-2 text-sm text-white/90">Review inactive areas/slots (45+ days) for archival or deletion.</p>
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={() => navigate('/admin/error-tracking')}
+                        className="text-left bg-gradient-to-br from-red-600 to-pink-600 text-white rounded-xl p-5 shadow-md hover:shadow-lg hover:scale-[1.01] transition"
+                    >
+                        <div className="text-xs uppercase tracking-wide opacity-90">System Health</div>
+                        <div className="text-xl font-bold mt-1">Error Tracking</div>
+                        <p className="mt-2 text-sm text-white/90">Monitor failed requests, exceptions, and slow API performance.</p>
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={() => navigate('/admin/analytics')}
+                        className="text-left bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-xl p-5 shadow-md hover:shadow-lg hover:scale-[1.01] transition"
+                    >
+                        <div className="text-xs uppercase tracking-wide opacity-90">Analytics</div>
+                        <div className="text-xl font-bold mt-1">Platform Analytics</div>
+                        <p className="mt-2 text-sm text-white/90">View utilization, revenue trends, and parking performance metrics.</p>
                     </button>
                 </div>
             </div>

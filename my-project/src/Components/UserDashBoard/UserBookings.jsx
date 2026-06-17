@@ -1,9 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import api from '/src/api';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
-import NavbarUser from './NavbarUser';
 import Footer from '../Footer/Footer';
 import ReviewModal from './ReviewModal';
 
@@ -48,7 +47,7 @@ const UserBookings = () => {
 
     try {
       return JSON.parse(storedUser);
-    } catch (e) {
+    } catch {
       return null;
     }
   }, []);
@@ -144,8 +143,6 @@ const UserBookings = () => {
 
   return (
     <main className="min-h-screen bg-slate-50 overflow-x-hidden">
-      <NavbarUser />
-
       <section className="py-8">
         <div className="container mx-auto max-w-[1200px] px-4 lg:px-8">
           {/* Header */}

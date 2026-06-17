@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import api from '/src/api';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -7,7 +7,7 @@ const decodeToken = (token) => {
     const payload = token.split('.')[1];
     const normalized = payload.replace(/-/g, '+').replace(/_/g, '/');
     return JSON.parse(atob(normalized));
-  } catch (e) {
+  } catch {
     return null;
   }
 };
@@ -64,9 +64,6 @@ const Login = () => {
       setError('Login failed. Please check your email and password.');
       console.error('Login error:', error);
     }
-  };
-  const RegisterNow = () => {
-    navigate(`/SignUp`);
   };
 
   return (

@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '/src/api';
-import NavbarUser from '../UserDashBoard/NavbarUser';
 
 const ProfileComponent = () => {
   const navigate = useNavigate();
@@ -86,8 +85,6 @@ const ProfileComponent = () => {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <NavbarUser />
-
       <main className="max-w-3xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-6">

@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import api from '/src/api';
 import { toast } from 'react-toastify';
-import Navbar from '../Navbar';
-import NavbarUser from './NavbarUser';
 import { Link } from 'react-router-dom';
 
 const Profile = () => {
@@ -78,8 +76,6 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <NavbarUser />
-
       <main className="max-w-4xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-6">

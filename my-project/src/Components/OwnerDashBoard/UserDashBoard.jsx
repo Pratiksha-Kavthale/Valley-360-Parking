@@ -1,32 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import api from '/src/api';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
-import NavbarUser from './NavbarUser';
 
 const UserDashboard = () => {
   const [parkingAreas, setParkingAreas] = useState([]);
-  const [userLocation, setUserLocation] = useState({ lat: null, lng: null });
   const navigate = useNavigate();
-  const [user, setUser] = useState(null); // Initialize user state
 
-  useEffect(() => {
-    // Retrieve the user object from sessionStorage
-    const storedUser = sessionStorage.getItem('user');
-    
-    if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      setUser(parsedUser);
-    }
-  }, []);
   useEffect(() => {
     const fetchParkingAreas = async () => {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           async (position) => {
             const { latitude, longitude } = position.coords;
-            setUserLocation({ lat: latitude, lng: longitude });
 
             try {
               const response = await api.get('http://localhost:8080/parkingArea/nearby', {
@@ -63,7 +50,6 @@ const UserDashboard = () => {
 
   return (
     <div>
-      <NavbarUser></NavbarUser>
     <div className="min-h-screen bg-gradient-to-br from-rose-100 via-orange-100 to-amber-200 text-slate-800 p-6">
       <ToastContainer position="top-center" />
       <div className="container mx-auto">

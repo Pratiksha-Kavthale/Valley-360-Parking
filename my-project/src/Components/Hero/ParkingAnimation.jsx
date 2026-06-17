@@ -27,14 +27,14 @@ const ParkingAnimation = () => {
     // 3. The "Swerve": Rotate to face the parking spot
     .to(carRef.current, { 
       rotation: 0, 
-      x: 130, 
+      x: 180, 
       y: 100, 
       duration: 0.8, 
       ease: "sine.inOut" 
     })
     // 4. The "Park": Reverse smoothly into the empty slot
     .to(carRef.current, { 
-      y: 185, 
+      y: 190, 
       duration: 1, 
       ease: "back.out(1.2)" // Gives it that slight 'bounce' when stopping
     })

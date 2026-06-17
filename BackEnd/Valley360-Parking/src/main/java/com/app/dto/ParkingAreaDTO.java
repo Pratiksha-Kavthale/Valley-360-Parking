@@ -76,6 +76,48 @@ public class ParkingAreaDTO extends BaseDTO{
 		this.pincode = pincode;
 	}
 	
+	// Distance from user location
+	private Double distance;
 	
+	public Double getDistance() {
+		return distance;
+	}
+	public void setDistance(Double distance) {
+		this.distance = distance;
+	}
+	
+	// Slots info
+	private Integer totalSlots;
+	private Integer availableSlots;
+	
+	public Integer getTotalSlots() {
+		return totalSlots;
+	}
+	public void setTotalSlots(Integer totalSlots) {
+		this.totalSlots = totalSlots;
+	}
+	public Integer getAvailableSlots() {
+		return availableSlots;
+	}
+	public void setAvailableSlots(Integer availableSlots) {
+		this.availableSlots = availableSlots;
+	}
+	
+	// Price range
+	private Double priceMin;
+	private Double priceMax;
+	
+	public Double getPriceMin() {
+		return priceMin;
+	}
+	public void setPriceMin(Double priceMin) {
+		this.priceMin = priceMin;
+	}
+	public Double getPriceMax() {
+		return priceMax;
+	}
+	public void setPriceMax(Double priceMax) {
+		this.priceMax = priceMax;
+	}
 	
 }

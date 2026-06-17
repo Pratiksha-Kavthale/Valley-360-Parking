@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import api from '/src/api';
 import { toast, ToastContainer } from 'react-toastify';
@@ -133,7 +133,7 @@ const BookingPayment = () => {
     try {
       await navigator.clipboard.writeText(paymentData.paymentUri);
       toast.success('UPI URI copied to clipboard!');
-    } catch (error) {
+    } catch {
       toast.error('Failed to copy to clipboard');
     }
   };

@@ -15,7 +15,6 @@ import {
   LuPin,
 } from 'react-icons/lu';
 import { useNavigate } from 'react-router-dom';
-import NavbarUser from './NavbarUser';
 import Footer from '../Footer/Footer';
 import ParkingMap from './ParkingMap';
 import { FadeRight, FadeUp } from '../../utility/annimation';
@@ -168,7 +167,6 @@ const UserDashboard = () => {
 
   return (
     <main className="min-h-screen bg-slate-50 overflow-x-hidden">
-      <NavbarUser />
 
       <section className="py-8 sm:py-12">
         <div className="container mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">

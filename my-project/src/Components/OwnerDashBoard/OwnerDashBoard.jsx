@@ -1,10 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import api from '/src/api';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { motion } from 'framer-motion';
 import { LuCalendarDays, LuCircleDollarSign, LuClock3, LuEye, LuHistory, LuCar, LuUsers } from 'react-icons/lu';
-import Navbar from './NavbarOwner';
 import Footer from '../Footer/Footer';
 import { FadeRight, FadeUp } from '../../utility/annimation';
 import { useNavigate  } from 'react-router-dom';
@@ -168,7 +167,6 @@ const OwnerDashboard = () => {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-rose-100 via-orange-100 to-amber-200 text-slate-800 overflow-x-hidden">
-      <Navbar />
 
       <section className="py-10 sm:py-16">
         <div className="container mx-auto max-w-[1200px] px-6 lg:px-8">

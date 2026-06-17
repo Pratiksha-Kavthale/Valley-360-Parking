@@ -1,5 +1,5 @@
 import backgroundImage from '../../Images/Registation_Bg.jpg'; // Adjust the path as needed
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import api from '/src/api';
 
@@ -54,7 +54,7 @@ const Registration = () => {
                 address,
                 roleId: parseInt(roleId, 10), // Convert roleId to integer
             })
-            .then(response => {
+            .then(() => {
                 toast.success("Signup Successful!"); // Display success message
                 window.location.href = '/';
             });
