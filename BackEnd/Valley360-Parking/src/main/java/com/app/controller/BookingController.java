@@ -35,7 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/booking")
 //@CrossOrigin(origins = "http://localhost:5173")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "https://spirited-essence-production.up.railway.app/")
 public class BookingController {
 
     private final BookingService bookingService;

@@ -18,7 +18,7 @@ import java.util.Map;
 @RequestMapping("/admin/cleanup")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "https://spirited-essence-production.up.railway.app/")
 public class CleanupController {
 
     private final CleanupService cleanupService;

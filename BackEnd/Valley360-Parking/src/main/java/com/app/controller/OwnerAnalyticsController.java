@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 @RestController
 @RequestMapping("/owner/analytics")
 //@CrossOrigin(origins = "${app.cors.allowed-origins:http://localhost:5173}")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "https://spirited-essence-production.up.railway.app/")
 @PreAuthorize("hasRole('OWNER')")
 public class OwnerAnalyticsController {
 

@@ -13,7 +13,7 @@ import java.util.Map;
 @RequestMapping("/analytics")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "https://spirited-essence-production.up.railway.app/")
 public class AnalyticsController {
 
     private final AnalyticsService analyticsService = null;

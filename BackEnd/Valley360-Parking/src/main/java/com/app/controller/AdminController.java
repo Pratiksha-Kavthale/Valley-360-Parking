@@ -36,7 +36,7 @@ import com.app.service.UserService;
 
 @RestController
 @RequestMapping("/Admin")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "https://spirited-essence-production.up.railway.app/")
 @SuppressWarnings("java:S107")
 public class AdminController {
 
