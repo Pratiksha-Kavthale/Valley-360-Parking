@@ -36,7 +36,7 @@ import com.app.service.UserService;
 
 @RestController
 @RequestMapping("/Admin")
-@CrossOrigin(origins = "${app.cors.allowed-origins:http://localhost:5173}")
+@CrossOrigin(origins = "*")
 @SuppressWarnings("java:S107")
 public class AdminController {
 

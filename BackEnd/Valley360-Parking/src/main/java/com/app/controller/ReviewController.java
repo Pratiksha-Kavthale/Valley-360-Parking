@@ -21,7 +21,8 @@ import com.app.service.ReviewService;
 
 @RestController
 @RequestMapping("/reviews")
-@CrossOrigin(origins = "${app.cors.allowed-origins:http://localhost:5173}")
+//@CrossOrigin(origins = "${app.cors.allowed-origins:http://localhost:5173}")
+@CrossOrigin(origins = "*")
 public class ReviewController {
 
     private final ReviewService reviewService;

@@ -26,7 +26,8 @@ import com.app.service.OwnerViewService;
 
 @RestController
 @RequestMapping("/owner")
-@CrossOrigin(origins = "${app.cors.allowed-origins:http://localhost:5173}")
+//@CrossOrigin(origins = "${app.cors.allowed-origins:http://localhost:5173}")
+@CrossOrigin(origins = "*")
 public class OwnerController {
 
     private final OwnerViewService ownerViewService;

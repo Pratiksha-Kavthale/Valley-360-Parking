@@ -21,7 +21,8 @@ import com.app.service.ParkingAreaService;
 
 @RestController
 @RequestMapping("/parkingArea")
-@CrossOrigin(origins = "${app.cors.allowed-origins:http://localhost:5173}")
+//@CrossOrigin(origins = "${app.cors.allowed-origins:http://localhost:5173}")
+@CrossOrigin(origins = "*")
 public class ParkingAreaController {
 
 	private final ParkingAreaService parkingAreaService;

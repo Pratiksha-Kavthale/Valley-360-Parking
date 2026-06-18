@@ -22,7 +22,8 @@ import java.time.LocalDateTime;
 @Slf4j
 @RestController
 @RequestMapping("/owner/analytics")
-@CrossOrigin(origins = "${app.cors.allowed-origins:http://localhost:5173}")
+//@CrossOrigin(origins = "${app.cors.allowed-origins:http://localhost:5173}")
+@CrossOrigin(origins = "*")
 @PreAuthorize("hasRole('OWNER')")
 public class OwnerAnalyticsController {
 

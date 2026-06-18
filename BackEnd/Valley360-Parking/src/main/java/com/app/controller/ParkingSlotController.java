@@ -18,7 +18,8 @@ import com.app.service.ParkingSlotService;
 
 @RestController
 @RequestMapping("/parkingSlots")
-@CrossOrigin(origins = "${app.cors.allowed-origins:http://localhost:5173}")
+//@CrossOrigin(origins = "${app.cors.allowed-origins:http://localhost:5173}")
+@CrossOrigin(origins = "*")
 public class ParkingSlotController {
 
 	private final ParkingSlotService parkingSlotService;
