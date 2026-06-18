@@ -34,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/User")
 //@CrossOrigin(origins = "${app.cors.allowed-origins:http://localhost:5173}")
-@CrossOrigin(origins = "https://spirited-essence-production.up.railway.app/")
+@CrossOrigin(origins = "https://valley-360-parking-7zi9-3h1p67c6w.vercel.app/")
 public class UserController {
 
 	private final UserService userService;
