@@ -464,14 +464,14 @@ const AnalyticsDashboard = ({ userType = 'user', userId, ownerId }) => {
       if (userType === 'owner' && ownerId) {
         // Owner analytics
         const [bookingsRes, areasRes] = await Promise.all([
-          api.get(`http://localhost:8080/booking/getByOwnerId/${ownerId}`).catch(() => ({ data: [] })),
-          api.get('http://localhost:8080/owner/parking-areas').catch(() => ({ data: [] })),
+          api.get(`https://spirited-essence-production.up.railway.app/booking/getByOwnerId/${ownerId}`).catch(() => ({ data: [] })),
+          api.get('https://spirited-essence-production.up.railway.app/owner/parking-areas').catch(() => ({ data: [] })),
         ]);
         setBookings(bookingsRes.data || []);
         setParkingAreas(areasRes.data || []);
       } else if (userId) {
         // User analytics
-        const bookingsRes = await api.get(`http://localhost:8080/booking/getByUserId/${userId}`).catch(() => ({ data: [] }));
+        const bookingsRes = await api.get(`https://spirited-essence-production.up.railway.app/booking/getByUserId/${userId}`).catch(() => ({ data: [] }));
         setBookings(bookingsRes.data || []);
       }
 
@@ -479,8 +479,8 @@ const AnalyticsDashboard = ({ userType = 'user', userId, ownerId }) => {
       try {
         const analyticsRes = await api.get(
           userType === 'owner' 
-            ? `http://localhost:8080/analytics/owner/${ownerId}/dashboard`
-            : `http://localhost:8080/analytics/user/${userId}/dashboard`
+            ? `https://spirited-essence-production.up.railway.app/analytics/owner/${ownerId}/dashboard`
+            : `https://spirited-essence-production.up.railway.app/analytics/user/${userId}/dashboard`
         );
         setAnalytics(analyticsRes.data);
       } catch {

@@ -16,7 +16,7 @@ const UserDashboard = () => {
             const { latitude, longitude } = position.coords;
 
             try {
-              const response = await api.get('http://localhost:8080/parkingArea/nearby', {
+              const response = await api.get('https://spirited-essence-production.up.railway.app/parkingArea/nearby', {
                 params: {
                   latitude,
                   longitude,

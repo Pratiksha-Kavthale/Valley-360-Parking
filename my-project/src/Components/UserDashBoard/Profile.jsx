@@ -28,7 +28,7 @@ const Profile = () => {
           }
 
           if (id) {
-            const response = await api.get(`http://localhost:8080/User/${id}`);
+            const response = await api.get(`https://spirited-essence-production.up.railway.app/User/${id}`);
             console.log('User data fetched from API:', response.data); // Debugging
             setUser(response.data);
           } else {

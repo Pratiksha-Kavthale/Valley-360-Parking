@@ -15,7 +15,7 @@ const AdminDashboard = () => {
         // Define the async function
         const fetchData = async () => {
             try {
-                const response = await api.get('http://localhost:8080/Admin/dashboard'); // Make sure this matches your actual endpoint
+                const response = await api.get('https://spirited-essence-production.up.railway.app/Admin/dashboard'); // Make sure this matches your actual endpoint
                 setData(response.data);
                
             } catch (error) {

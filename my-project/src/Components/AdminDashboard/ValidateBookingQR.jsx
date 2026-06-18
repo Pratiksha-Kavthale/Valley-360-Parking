@@ -59,7 +59,7 @@ const ValidateBookingQR = () => {
     if (!qrToken.trim()) { setResult({ result: 'INVALID', message: 'Please enter a QR token.' }); return; }
     setLoading(true);
     try {
-      const res = await api.post('http://localhost:8080/booking/validate-qr', { qrToken: qrToken.trim() });
+      const res = await api.post('https://spirited-essence-production.up.railway.app/booking/validate-qr', { qrToken: qrToken.trim() });
       setResult(res.data);
     } catch { setResult({ result: 'INVALID', message: 'Validation failed. Please try again.' }); }
     finally { setLoading(false); }
@@ -71,7 +71,7 @@ const ValidateBookingQR = () => {
     if (code.length < 6) { setResult({ result: 'INVALID', message: 'Please enter all 6 OTP digits.' }); return; }
     setLoading(true);
     try {
-      const res = await api.post('http://localhost:8080/booking/validate-otp', { otp: code });
+      const res = await api.post('https://spirited-essence-production.up.railway.app/booking/validate-otp', { otp: code });
       setResult(res.data);
     } catch { setResult({ result: 'INVALID', message: 'OTP validation failed. Please try again.' }); }
     finally { setLoading(false); }

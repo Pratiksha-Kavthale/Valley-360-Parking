@@ -26,7 +26,7 @@ const ProfileComponent = () => {
       if (userStr) {
         try {
           const user = JSON.parse(userStr);
-          const response = await api.get(`http://localhost:8080/User/${user.id}`);
+          const response = await api.get(`https://spirited-essence-production.up.railway.app/User/${user.id}`);
           setFormData((prev) => ({ ...prev, ...response.data }));
         } catch (error) {
           console.error('Error fetching profile:', error);
@@ -58,7 +58,7 @@ const ProfileComponent = () => {
 
     if (Object.keys(newErrors).length === 0) {
       try {
-        await api.put(`http://localhost:8080/User/${formData.id}`, formData);
+        await api.put(`https://spirited-essence-production.up.railway.app/User/${formData.id}`, formData);
         setSuccess('Profile updated successfully!');
         setTimeout(() => navigate('/Profile'), 1500);
       } catch (error) {

@@ -91,7 +91,7 @@ const ParkingSlotForm = () => {
 
         try {
             console.log('Submitting parking slot with data:', { slotNumber, price, vehicleType, status, areaId }); // Debugging form data
-            const response = await api.post('http://localhost:8080/parkingSlots/Add', {
+            const response = await api.post('https://spirited-essence-production.up.railway.app/parkingSlots/Add', {
                 slotNumber,
                 price,
                 vehicleType,

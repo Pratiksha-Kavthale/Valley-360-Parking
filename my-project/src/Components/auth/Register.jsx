@@ -132,7 +132,7 @@ const Register = () => {
     if (formData.role === 'ROLE_ADMIN') {
       // Admin registration with employee ID verification
       try {
-        const response = await fetch(`http://localhost:8080/Admin/Register?employeeId=${formData.employeeId}`, {
+        const response = await fetch(`https://spirited-essence-production.up.railway.app/Admin/Register?employeeId=${formData.employeeId}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

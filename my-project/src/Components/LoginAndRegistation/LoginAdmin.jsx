@@ -14,7 +14,7 @@ const LoginAdmin = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        api.post('http://localhost:8080/Admin/Login', null, {
+        api.post('https://spirited-essence-production.up.railway.app/Admin/Login', null, {
             params: {
                 email: user.email,
                 password: user.password

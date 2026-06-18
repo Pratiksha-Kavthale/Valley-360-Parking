@@ -22,7 +22,7 @@ const ParkingSlots = () => {
   useEffect(() => {
     const fetchSlots = async () => {
       try {
-        const response = await api.get(`http://localhost:8080/parkingSlots/${parkingId}`);
+        const response = await api.get(`https://spirited-essence-production.up.railway.app/parkingSlots/${parkingId}`);
         setSlots(response.data);
       } catch (error) {
         

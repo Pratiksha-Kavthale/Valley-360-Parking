@@ -27,7 +27,7 @@ const Login = () => {
     try {
       console.log("email", user.email);
       console.log("password", user.password);
-      const response = await api.post('http://localhost:8080/User/Login', null, {
+      const response = await api.post('https://spirited-essence-production.up.railway.app/User/Login', null, {
         params: {
           email: user.email,
           password: user.password,

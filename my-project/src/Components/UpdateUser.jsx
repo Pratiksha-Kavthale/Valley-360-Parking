@@ -54,7 +54,7 @@ const UpdateUserPage = () => {
     }
 
     try {
-      const response = await api.put(`http://localhost:8080/User/updateUser/${user.email}`, {
+      const response = await api.put(`https://spirited-essence-production.up.railway.app/User/updateUser/${user.email}`, {
         firstName,
         lastName,
         contact,

@@ -22,7 +22,7 @@ const BookParking = () => {
       const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-          await api.post('http://localhost:8080/booking/Book', formData);
+          await api.post('https://spirited-essence-production.up.railway.app/booking/Book', formData);
           alert('Booking successful!');
         } catch (error) {
           alert('Error during booking');

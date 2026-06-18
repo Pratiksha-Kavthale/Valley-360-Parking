@@ -13,7 +13,7 @@ const OwnersList = () => {
 
   const fetchOwners = async () => {
     try {
-      const response = await api.get('http://localhost:8080/User/GetAllOwners'); // Ensure URL matches the backend
+      const response = await api.get('https://spirited-essence-production.up.railway.app/User/GetAllOwners'); // Ensure URL matches the backend
       setOwners(response.data);
     } catch (error) {
       toast.error('Error fetching owners');
@@ -26,7 +26,7 @@ const OwnersList = () => {
   const handleDelete = async (id) => {
     try {
       console.log({id})
-      await api.delete(`http://localhost:8080/Admin/Delete/${id}`);
+      await api.delete(`https://spirited-essence-production.up.railway.app/Admin/Delete/${id}`);
       toast.success('User deleted successfully');
       // Refresh the list after deletion
       fetchOwners();

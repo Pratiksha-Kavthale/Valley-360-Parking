@@ -9,7 +9,7 @@ const ViewParkingArea = () => {
   useEffect(() => {
     const fetchParkingAreas = async () => {
       try {
-        const response = await api.get('http://localhost:8080/parkingArea/GetAllParkingArea');
+        const response = await api.get('https://spirited-essence-production.up.railway.app/parkingArea/GetAllParkingArea');
         setParkingAreas(response.data);
       } catch (error) {
         setError('Error fetching parking slots');
@@ -25,7 +25,7 @@ const ViewParkingArea = () => {
   
 const handleDelete = async (id) => {
   try {
-   await api.delete(`http://localhost:8080/Admin/deleteParkignArea/${id}`);
+   await api.delete(`https://spirited-essence-production.up.railway.app/Admin/deleteParkignArea/${id}`);
     setParkingAreas((prevAreas) => prevAreas.filter((area) => area.id !== id));
   } catch (error) {
     console.error('Error deleting parking area:', error);

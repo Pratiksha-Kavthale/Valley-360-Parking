@@ -44,7 +44,7 @@ const Registration = () => {
 
         try {
             // Send a POST request to the backend with the form data
-            await api.post('http://localhost:8080/User/Register', {
+            await api.post('https://spirited-essence-production.up.railway.app/User/Register', {
                 firstName,
                 lastName,
                 email,

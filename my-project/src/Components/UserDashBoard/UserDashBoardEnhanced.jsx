@@ -265,7 +265,7 @@ const UserDashboardEnhanced = () => {
         setUserLocation({ lat: latitude, lng: longitude });
 
         try {
-          const response = await api.get('http://localhost:8080/parkingArea/nearby', {
+          const response = await api.get('https://spirited-essence-production.up.railway.app/parkingArea/nearby', {
             params: { latitude, longitude, radiusKm },
           });
           setParkingAreas(response.data);
@@ -295,7 +295,7 @@ const UserDashboardEnhanced = () => {
       const fetchWithRadius = async () => {
         setLoading(true);
         try {
-          const response = await api.get('http://localhost:8080/parkingArea/nearby', {
+          const response = await api.get('https://spirited-essence-production.up.railway.app/parkingArea/nearby', {
             params: { latitude: userLocation.lat, longitude: userLocation.lng, radiusKm },
           });
           setParkingAreas(response.data);

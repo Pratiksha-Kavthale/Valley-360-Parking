@@ -69,7 +69,7 @@ const AddParkingArea = () => {
 
 
     try {
-      const response = await api.post('http://localhost:8080/parkingArea/add', {
+      const response = await api.post('https://spirited-essence-production.up.railway.app/parkingArea/add', {
         area,
         city,
         pincode,
