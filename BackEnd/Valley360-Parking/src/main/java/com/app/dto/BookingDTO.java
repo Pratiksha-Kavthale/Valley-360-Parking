@@ -48,6 +48,8 @@ public class BookingDTO extends BaseDTO {
 
 	private String qrToken;
 
+	private String otp;
+
 	private String paymentUtrNumber;
 
 	private String paymentScreenshotPath;
@@ -158,6 +160,14 @@ public class BookingDTO extends BaseDTO {
 
 	public void setQrToken(String qrToken) {
 		this.qrToken = qrToken;
+	}
+
+	public String getOtp() {
+		return otp;
+	}
+
+	public void setOtp(String otp) {
+		this.otp = otp;
 	}
 
 	public String getPaymentUtrNumber() {

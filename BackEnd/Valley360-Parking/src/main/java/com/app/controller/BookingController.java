@@ -57,6 +57,12 @@ public class BookingController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/validate-otp")
+    public ResponseEntity<QrValidationResponseDTO> validateOtp(@RequestBody java.util.Map<String, String> request) {
+        QrValidationResponseDTO response = bookingService.validateOtp(request.get("otp"));
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/today/{ownerId}")
     public ResponseEntity<List<BookingDTO>> getTodaysBookings(@PathVariable Long ownerId) {
         log.debug("Fetching today's bookings for ownerId={}", ownerId);

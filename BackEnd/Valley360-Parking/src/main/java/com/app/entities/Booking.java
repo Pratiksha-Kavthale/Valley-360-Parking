@@ -54,6 +54,9 @@ public class Booking extends BaseEntity {
 	@Column(unique = true, length = 64)
 	private String qrToken;
 
+	@Column(length = 6)
+	private String otp;
+
 	@Column(unique = true, length = 64)
 	private String paymentUtrNumber;
 
@@ -183,6 +186,14 @@ public class Booking extends BaseEntity {
 
 	public void setQrToken(String qrToken) {
 		this.qrToken = qrToken;
+	}
+
+	public String getOtp() {
+		return otp;
+	}
+
+	public void setOtp(String otp) {
+		this.otp = otp;
 	}
 
 	public String getPaymentUtrNumber() {

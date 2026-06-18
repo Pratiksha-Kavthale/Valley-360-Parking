@@ -42,7 +42,7 @@ public class SecurityConfig {
 			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, ex.getMessage());
 		}).and().authorizeRequests()
 				// Specific public endpoints first (more specific rules before general ones)
-				.antMatchers("/Admin/Login", "/Admin/Register", "/User/Register", "/SignUp", "/User/Login", "/api/auth/**",
+				.antMatchers("/Admin/Login", "/Admin/Register", "/User/Register", "Login","/SignUp", "/User/Login", "/api/auth/**",
 						"/swagger*/**", "/v*/api-docs/**")
 				.permitAll()
 				.antMatchers(HttpMethod.GET, "/reviews/**").permitAll()

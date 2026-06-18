@@ -107,15 +107,26 @@ const ParkingAreaCard = ({ area, onBook, loading }) => {
     );
   }
 
-  const statusColors = {
-    ACTIVE: 'bg-emerald-100 text-emerald-700',
-    INACTIVE: 'bg-red-100 text-red-700',
-    MAINTENANCE: 'bg-amber-100 text-amber-700',
-  };
-
   // Calculate available slots
   const totalSlots = area.totalSlots || area.slots?.length || 0;
   const availableSlots = area.availableSlots ?? area.slots?.filter(s => s.status === 'AVAILABLE')?.length ?? totalSlots;
+  const isFull = totalSlots > 0 && availableSlots === 0;
+
+  // Derive effective status — override to NOT_AVAILABLE when all slots are booked
+  const effectiveStatus = isFull ? 'NOT_AVAILABLE' : (area.status || 'ACTIVE');
+
+  const statusColors = {
+    ACTIVE: 'bg-emerald-100 text-emerald-700',
+    NOT_AVAILABLE: 'bg-red-100 text-red-700',
+    INACTIVE: 'bg-red-100 text-red-700',
+    MAINTENANCE: 'bg-amber-100 text-amber-700',
+  };
+  const statusLabel = {
+    ACTIVE: 'Active',
+    NOT_AVAILABLE: 'Not Available',
+    INACTIVE: 'Inactive',
+    MAINTENANCE: 'Maintenance',
+  };
 
   // Price display logic
   const priceMin = area.priceMin || area.price || 0;
@@ -136,8 +147,8 @@ const ParkingAreaCard = ({ area, onBook, loading }) => {
           <LuCar className="w-16 h-16 text-rose-300" />
         </div>
         <div className="absolute top-3 right-3">
-          <span className={`px-2 py-1 text-xs font-semibold rounded-full ${statusColors[area.status] || statusColors.ACTIVE}`}>
-            {area.status || 'Active'}
+          <span className={`px-2 py-1 text-xs font-semibold rounded-full ${statusColors[effectiveStatus] || statusColors.ACTIVE}`}>
+            {statusLabel[effectiveStatus] || effectiveStatus}
           </span>
         </div>
         {area.distance !== undefined && (
@@ -147,9 +158,9 @@ const ParkingAreaCard = ({ area, onBook, loading }) => {
           </div>
         )}
         {totalSlots > 0 && (
-          <div className="absolute bottom-3 right-3 flex items-center gap-1.5 px-2 py-1 bg-emerald-500/90 backdrop-blur-sm rounded-full text-xs font-medium text-white">
+          <div className={`absolute bottom-3 right-3 flex items-center gap-1.5 px-2 py-1 backdrop-blur-sm rounded-full text-xs font-medium text-white ${isFull ? 'bg-red-500/90' : 'bg-emerald-500/90'}`}>
             <LuCar className="w-3 h-3" />
-            {availableSlots}/{totalSlots} slots
+            {isFull ? 'Full' : `${availableSlots}/${totalSlots} slots`}
           </div>
         )}
       </div>
@@ -176,13 +187,18 @@ const ParkingAreaCard = ({ area, onBook, loading }) => {
         </div>
 
         <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => onBook(area.id)}
-          className="w-full py-2.5 bg-gradient-to-r from-rose-500 to-orange-500 text-white font-medium rounded-xl shadow-lg shadow-rose-200 hover:shadow-xl transition-all flex items-center justify-center gap-2"
+          whileHover={isFull ? {} : { scale: 1.02 }}
+          whileTap={isFull ? {} : { scale: 0.98 }}
+          onClick={() => !isFull && onBook(area.id)}
+          disabled={isFull}
+          className={`w-full py-2.5 font-medium rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 ${
+            isFull
+              ? 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'
+              : 'bg-gradient-to-r from-rose-500 to-orange-500 text-white shadow-rose-200 hover:shadow-xl'
+          }`}
         >
-          View Slots
-          <HiOutlineChevronRight className="w-4 h-4" />
+          {isFull ? 'No Slots Available' : 'View Slots'}
+          {!isFull && <HiOutlineChevronRight className="w-4 h-4" />}
         </motion.button>
       </div>
     </motion.div>

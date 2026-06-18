@@ -48,10 +48,15 @@ const Footer = () => {
           <div>
             <h3 className='text-sm font-semibold uppercase tracking-wider text-slate-300 mb-4'>Quick Links</h3>
             <ul className='space-y-2'>
-              {['Home', 'About Us', 'Contact', 'Login'].map((link, index) => (
+              {[
+                { label: 'Home', path: '/' },
+                { label: 'About Us', path: '/AboutUs' },
+                { label: 'Contact', path: '/ContactUs' },
+                { label: 'Login', path: '/Login' },
+              ].map((link, index) => (
                 <li key={index}>
-                  <Link to={`/${link.toLowerCase().replace(' ', '-')}`} className='text-slate-400 hover:text-rose-400 text-sm transition-colors'>
-                    {link}
+                  <Link to={link.path} className='text-slate-400 hover:text-rose-400 text-sm transition-colors'>
+                    {link.label}
                   </Link>
                 </li>
               ))}

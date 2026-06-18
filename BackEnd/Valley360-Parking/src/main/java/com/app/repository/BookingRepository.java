@@ -12,10 +12,13 @@ import org.springframework.data.repository.query.Param;
 
 import com.app.entities.Booking;
 import com.app.enums.BookingPaymentStatus;
+import com.app.enums.BookingStatus;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
 	Optional<Booking> findByQrToken(String qrToken);
+
+	Optional<Booking> findByOtp(String otp);
 
 	// @Query("SELECT b FROM Booking b WHERE b.parkingSlot.parking.user.id =
 	// :ownerId AND b.date = :date")
@@ -55,5 +58,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
 	@Query("SELECT b FROM Booking b WHERE b.paymentStatus = :status AND b.paymentExpiresAt IS NOT NULL AND b.paymentExpiresAt < :now")
 	List<Booking> findExpiredPendingPayments(@Param("status") BookingPaymentStatus status,
+			@Param("now") LocalDateTime now);
+	@Query("SELECT b FROM Booking b JOIN FETCH b.parkingSlot ps WHERE b.endTime IS NOT NULL AND b.endTime < :now AND b.status IN :statuses")
+	List<Booking> findExpiredActiveBookings(@Param("statuses") List<BookingStatus> statuses,
 			@Param("now") LocalDateTime now);
 }

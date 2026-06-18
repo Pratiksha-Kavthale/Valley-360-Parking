@@ -145,8 +145,12 @@ const UserDashboard = () => {
             <p className="text-sm text-slate-500">{area.area}</p>
           </div>
         </div>
-        <span className="rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700">
-          {area.status}
+        <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${
+          area.availableSlots === 0 && area.totalSlots > 0
+            ? 'bg-red-100 text-red-700'
+            : 'bg-green-100 text-green-700'
+        }`}>
+          {area.availableSlots === 0 && area.totalSlots > 0 ? 'Not Available' : area.status}
         </span>
       </div>
 

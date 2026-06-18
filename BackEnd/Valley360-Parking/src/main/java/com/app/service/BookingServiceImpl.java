@@ -89,6 +89,7 @@ public class BookingServiceImpl implements BookingService {
 		book.setPaymentStatus(BookingPaymentStatus.PENDING_PAYMENT);
 		book.setPaymentExpiresAt(LocalDateTime.now().plusMinutes(paymentExpiryMinutes));
 		book.setQrToken(generateUniqueQrToken());
+		book.setOtp(generateUniqueOtp());
 
 		Booking savedBooking = bookingRepo.save(book);
 
@@ -108,6 +109,7 @@ public class BookingServiceImpl implements BookingService {
 		response.setTotalPrice(savedBooking.getTotalPrice());
 		response.setPrice(savedBooking.getTotalPrice());
 		response.setStatus(BookingStatus.valueOf(getBookingStatus(savedBooking)));
+		response.setOtp(savedBooking.getOtp());
 		return response;
 
 	}
@@ -192,6 +194,54 @@ public class BookingServiceImpl implements BookingService {
 			token = UUID.randomUUID().toString();
 		} while (bookingRepo.findByQrToken(token).isPresent());
 		return token;
+	}
+
+	private String generateUniqueOtp() {
+		String otp;
+		do {
+			otp = String.format("%06d", (int)(Math.random() * 1_000_000));
+		} while (bookingRepo.findByOtp(otp).isPresent());
+		return otp;
+	}
+
+	@Override
+	public QrValidationResponseDTO validateOtp(String otp) {
+		if (otp == null || otp.trim().isEmpty()) {
+			return new QrValidationResponseDTO(QR_STATUS_INVALID, "OTP is required.", null);
+		}
+
+		Booking booking = bookingRepo.findByOtp(otp.trim()).orElse(null);
+
+		if (booking == null) {
+			return new QrValidationResponseDTO(QR_STATUS_INVALID, "Invalid OTP. No matching booking found.", null);
+		}
+
+		if (booking.getPaymentStatus() != null
+				&& booking.getPaymentStatus() != BookingPaymentStatus.BOOKING_CONFIRMED) {
+			return new QrValidationResponseDTO(QR_STATUS_INVALID, "Booking payment is not confirmed yet.", booking.getId());
+		}
+
+		LocalDateTime now = LocalDateTime.now();
+
+		if (booking.getDepartureDate() != null && now.isAfter(booking.getDepartureDate())) {
+			if (booking.getStatus() != BookingStatus.EXPIRED) {
+				booking.setStatus(BookingStatus.EXPIRED);
+				bookingRepo.save(booking);
+			}
+			return new QrValidationResponseDTO("EXPIRED", "Booking has expired.", booking.getId());
+		}
+
+		if (booking.getStatus() == BookingStatus.USED) {
+			return new QrValidationResponseDTO(QR_STATUS_INVALID, "OTP already used.", booking.getId());
+		}
+
+		if (booking.getArrivalDate() != null && now.isBefore(booking.getArrivalDate())) {
+			return new QrValidationResponseDTO(QR_STATUS_INVALID, "Booking window has not started yet.", booking.getId());
+		}
+
+		booking.setStatus(BookingStatus.USED);
+		bookingRepo.save(booking);
+		return new QrValidationResponseDTO("SUCCESS", "OTP validated successfully. Entry granted.", booking.getId());
 	}
 
 	@Override

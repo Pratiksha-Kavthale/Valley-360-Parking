@@ -123,10 +123,12 @@ export const EmptyState = ({
 );
 
 // Glass Card Component
-export const GlassCard = ({ children, className = '', hover = true }) => (
+export const GlassCard = ({ children, className = '', hover = true, onClick, ...rest }) => (
   <motion.div
     whileHover={hover ? { y: -4, boxShadow: '0 20px 40px -12px rgba(0,0,0,0.15)' } : {}}
     className={`bg-white/80 backdrop-blur-xl rounded-2xl border border-white/20 shadow-lg ${className}`}
+    onClick={onClick}
+    {...rest}
   >
     {children}
   </motion.div>

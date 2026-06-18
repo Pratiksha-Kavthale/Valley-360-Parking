@@ -12,6 +12,8 @@ public interface BookingService {
 
 	QrValidationResponseDTO validateQrToken(String qrToken);
 
+	QrValidationResponseDTO validateOtp(String otp);
+
 	List<Booking> viewBookingHistory(Long id);
 
 	List<BookingDTO> getTodaysBookings(Long ownerId);

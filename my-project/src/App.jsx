@@ -39,6 +39,7 @@ import OwnerParkingAreas from './Components/OwnerDashBoard/OwnerParkingAreas';
 import OwnerParkingSlots from './Components/OwnerDashBoard/OwnerParkingSlots';
 import OwnerSlotTimeline from './Components/OwnerDashBoard/OwnerSlotTimeline';
 import ProtectedRoute from './Components/ProtectedRoute';
+import ScrollToTop from './Components/ScrollToTop';
 import OwnerRiskMonitor from './Components/AdminDashboard/OwnerRiskMonitor';
 import ReviewAnalytics from './Components/OwnerDashBoard/ReviewAnalytics';
 import BookingPayment from './Components/UserDashBoard/BookingPayment';
@@ -57,6 +58,7 @@ function App() {
       <NotificationProvider>
         <AuthProvider>
           <Router>
+            <ScrollToTop />
             <Routes>
         <Route path="/" element={
           <MainLayout>
