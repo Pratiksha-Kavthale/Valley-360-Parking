@@ -48,10 +48,9 @@ import OwnerPaymentReview from './Components/OwnerDashBoard/PaymentReview';
 import AdminPaymentReview from './Components/AdminDashboard/PaymentReview';
 
 // New Professional Components
-export { Login } from './Components/auth/Login.jsx';
-export { Register } from './Components/auth/Register';
-
-import { UserDashboard as NewUserDashboard } from './components/dashboard';
+// import { Login as NewLogin } from './components/Auth/Login.jsx';
+// import { Register as NewRegister} from './Components/auth/Register'
+// import { UserDashboard as NewUserDashboard } from './components/dashboard';
 
 
 function App() {
@@ -120,9 +119,9 @@ function App() {
         <Route path="/admin/validate-qr" element={<MainLayout forceVariant="admin"><ValidateBookingQR/></MainLayout>}></Route>
 
         {/* New Professional Routes (optional - can replace old ones) */}
-        <Route path="/login-new" element={<MainLayout><NewLogin /></MainLayout>} />
+        {/* <Route path="/login-new" element={<MainLayout><NewLogin /></MainLayout>} />
         <Route path="/register-new" element={<MainLayout><NewRegister /></MainLayout>} />
-        <Route path="/dashboard-new" element={<MainLayout forceVariant="user"><NewUserDashboard /></MainLayout>} />
+        <Route path="/dashboard-new" element={<MainLayout forceVariant="user"><NewUserDashboard /></MainLayout>} /> */}
       </Routes>
           </Router>
         </AuthProvider>
