@@ -48,7 +48,9 @@ import OwnerPaymentReview from './Components/OwnerDashBoard/PaymentReview';
 import AdminPaymentReview from './Components/AdminDashboard/PaymentReview';
 
 // New Professional Components
-import { Login as NewLogin, Register as NewRegister } from './components/Auth';
+export { Login } from './Components/auth/Login.jsx';
+export { Register } from './Components/auth/Register';
+
 import { UserDashboard as NewUserDashboard } from './components/dashboard';
 
 
