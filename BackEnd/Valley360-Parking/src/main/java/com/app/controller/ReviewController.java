@@ -22,7 +22,10 @@ import com.app.service.ReviewService;
 @RestController
 @RequestMapping("/reviews")
 //@CrossOrigin(origins = "${app.cors.allowed-origins:http://localhost:5173}")
-@CrossOrigin(origins = "https://spirited-essence-production.up.railway.app/")
+@CrossOrigin(origins = {
+	    "http://localhost:5173",
+	    "https://valley-360-parking-7zi9-ript5gl4k.vercel.app"
+	})
 public class ReviewController {
 
     private final ReviewService reviewService;
