@@ -91,7 +91,7 @@ const BookParking = () => {
 
     try {
       setSubmitting(true);
-      const response = await api.post('https://spirited-essence-production.up.railway.app/booking/add', {
+      const response = await api.post('http://localhost:8080/booking/add', {
         ...formData,
         parkingHours: hours,
         price: calculatedPrice,

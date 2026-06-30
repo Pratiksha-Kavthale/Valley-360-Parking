@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import api from '/src/api';
 import { useParams, useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
 
 const ParkingSlots = () => {
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ const ParkingSlots = () => {
   useEffect(() => {
     const fetchSlots = async () => {
       try {
-        const response = await api.get(`https://spirited-essence-production.up.railway.app/parkingSlots/${parkingId}`);
+        const response = await api.get(`http://localhost:8080/parkingSlots/${parkingId}`);
         setSlots(response.data);
       } catch (error) {
         
@@ -51,9 +52,9 @@ const ParkingSlots = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {slots.length > 0 ? (
             slots.map((slot, index) => (
-              <div key={`${slot.id}-${index}`} className="bg-white text-black rounded-xl p-4 shadow-lg border border-rose-100">
-                <h2 className="text-2xl font-bold">Slot Number: {slot.number}</h2>
-                <p>Vehicle Type: {slot.vehicleType}</p>
+              <div key={`${slot.id}-${index}`} className="bg-white text-black-500 rounded-xl p-4 shadow-lg border border-rose-100">
+                <h2 className="text-2xl">Slot Number: {slot.number}</h2>
+                <p className='text-black'>Vehicle Type: {slot.vehicleType}</p>
                 <p>Status: {slot.status}</p>
                 <p>Price: {slot.price ? `$${slot.price.toFixed(2)}` : 'N/A'}</p>
                 <button

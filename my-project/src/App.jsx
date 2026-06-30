@@ -73,7 +73,7 @@ function App() {
           </MainLayout>
         } />
         <Route path="/SignUp" element={<MainLayout><Registation /></MainLayout>} />
-        <Route path="/AddParking" element={<MainLayout forceVariant="owner"><ParkingSlotForm /></MainLayout>} />
+        <Route path="/AddParking" element={<ProtectedRoute allowedRoles={["ROLE_OWNER"]}><MainLayout forceVariant="owner"><ParkingSlotForm /></MainLayout></ProtectedRoute>} />
         <Route path="/UserDashBoard" element={<UserDashboardEnhanced />} />
         <Route path="/UserDashBoard/old" element={<MainLayout forceVariant="user"><UserDashboard /></MainLayout>} />
         <Route path="/ViewSlots/:parkingId" element={<MainLayout forceVariant="user"><ViewSlots /></MainLayout>} />
@@ -100,8 +100,8 @@ function App() {
         <Route path="admin/owners" element={<MainLayout forceVariant="admin"><OwnersList /></MainLayout>} />
         <Route path="admin/customers" element={<MainLayout forceVariant="admin"><CustomersList /></MainLayout>} />
         <Route path="Update1" element={<MainLayout><ProfileComponent /></MainLayout>} />
-        <Route path="/AddParkingSlot" element={<MainLayout forceVariant="owner"><ParkingSlotForm /></MainLayout>} />
-        <Route path="/AddParkingArea" element={<MainLayout forceVariant="owner"><AddParkingArea /></MainLayout>} />
+        <Route path="/AddParkingSlot" element={<ProtectedRoute allowedRoles={["ROLE_OWNER"]}><MainLayout forceVariant="owner"><ParkingSlotForm /></MainLayout></ProtectedRoute>} />
+        <Route path="/AddParkingArea" element={<ProtectedRoute allowedRoles={["ROLE_OWNER"]}><MainLayout forceVariant="owner"><AddParkingArea /></MainLayout></ProtectedRoute>} />
         <Route path="OwnerDashBoard" element={<ProtectedRoute allowedRoles={["ROLE_OWNER"]}><MainLayout forceVariant="owner"><OwnerDashboardEnhanced /></MainLayout></ProtectedRoute>} />
         <Route path="/owner/review-analytics" element={<ProtectedRoute allowedRoles={["ROLE_OWNER"]}><MainLayout forceVariant="owner"><ReviewAnalytics /></MainLayout></ProtectedRoute>} />
         <Route path="/owner/parking-areas" element={<ProtectedRoute allowedRoles={["ROLE_OWNER"]}><MainLayout forceVariant="owner"><OwnerParkingAreas /></MainLayout></ProtectedRoute>} />
@@ -110,13 +110,14 @@ function App() {
         <Route path="/owner/slots/:slotId/timeline" element={<ProtectedRoute allowedRoles={["ROLE_OWNER"]}><MainLayout forceVariant="owner"><OwnerSlotTimeline /></MainLayout></ProtectedRoute>} />
         <Route path="/owner/payment-settings" element={<ProtectedRoute allowedRoles={["ROLE_OWNER"]}><MainLayout forceVariant="owner"><PaymentSettings /></MainLayout></ProtectedRoute>} />
         <Route path="/owner/payment-review" element={<ProtectedRoute allowedRoles={["ROLE_OWNER"]}><MainLayout forceVariant="owner"><OwnerPaymentReview /></MainLayout></ProtectedRoute>} />
+        <Route path="/owner/validate-booking" element={<ProtectedRoute allowedRoles={["ROLE_OWNER"]}><MainLayout forceVariant="owner"><ValidateBookingQR /></MainLayout></ProtectedRoute>} />
         <Route path='Delete/:userid' element={<MainLayout><DeleteUser/></MainLayout>}></Route>
         <Route path='/logout' element={<MainLayout><Logout/></MainLayout>}></Route>
         <Route path="/Book/:slotId" element={<MainLayout forceVariant="user"><BookParking/></MainLayout>}></Route>
         <Route path="/BookingPayment/:bookingId" element={<ProtectedRoute allowedRoles={["ROLE_CUSTOMER"]}><MainLayout forceVariant="user"><BookingPayment /></MainLayout></ProtectedRoute>}></Route>
         <Route path="/BookingQR" element={<MainLayout forceVariant="user"><BookingQR/></MainLayout>}></Route>
         <Route path="/user/bookings" element={<MainLayout forceVariant="user"><UserBookings/></MainLayout>}></Route>
-        <Route path="/admin/validate-qr" element={<MainLayout forceVariant="admin"><ValidateBookingQR/></MainLayout>}></Route>
+        <Route path="/admin/validate-qr" element={<ProtectedRoute allowedRoles={["ROLE_ADMIN"]}><MainLayout forceVariant="admin"><ValidateBookingQR/></MainLayout></ProtectedRoute>}></Route>
 
         {/* New Professional Routes (optional - can replace old ones) */}
         {/* <Route path="/login-new" element={<MainLayout><NewLogin /></MainLayout>} />

@@ -55,6 +55,7 @@ const ownerMenuItems = [
   { id: 'add-area', title: 'Add Area', icon: HiOutlinePlus, link: '/AddParkingArea' },
   { id: 'analytics', title: 'Analytics', icon: HiOutlineTrendingUp, link: '/owner/review-analytics' },
   { id: 'payments', title: 'Payments', icon: HiOutlineCreditCard, link: '/owner/payment-review' },
+  { id: 'validate-entry', title: 'Verify Entry', icon: HiOutlineQrcode, link: '/owner/validate-booking' },
   { id: 'settings', title: 'Payment Settings', icon: HiOutlineCog, link: '/owner/payment-settings' },
 ];
 

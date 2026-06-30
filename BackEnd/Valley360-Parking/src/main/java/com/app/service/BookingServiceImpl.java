@@ -30,6 +30,7 @@ import com.app.repository.BookingRepository;
 import com.app.repository.ParkingSlotRepository;
 import com.app.repository.ReviewRepository;
 import com.app.repository.UserRepository;
+import com.app.service.NotificationService;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -44,17 +45,19 @@ public class BookingServiceImpl implements BookingService {
 	private final ParkingSlotRepository parkingSlotRepo;
 	private final ModelMapper mapper;
 	private final ReviewRepository reviewRepository;
+	private final NotificationService notificationService;
 
 	@Value("${app.payment.expiry-minutes:10}")
 	private long paymentExpiryMinutes;
 
 	public BookingServiceImpl(BookingRepository bookingRepo, UserRepository userRepo, ParkingSlotRepository parkingSlotRepo,
-			ModelMapper mapper, ReviewRepository reviewRepository) {
+			ModelMapper mapper, ReviewRepository reviewRepository, NotificationService notificationService) {
 		this.bookingRepo = bookingRepo;
 		this.userRepo = userRepo;
 		this.parkingSlotRepo = parkingSlotRepo;
 		this.mapper = mapper;
 		this.reviewRepository = reviewRepository;
+		this.notificationService = notificationService;
 	}
 
 	@Override
@@ -92,6 +95,29 @@ public class BookingServiceImpl implements BookingService {
 		book.setOtp(generateUniqueOtp());
 
 		Booking savedBooking = bookingRepo.save(book);
+
+		// Send SMS notifications to customer and owner
+		try {
+			User owner = parkingSlot.getParking() != null ? parkingSlot.getParking().getUser() : null;
+			String customerPhone = user.getContact();
+			String ownerPhone = owner != null ? owner.getContact() : null;
+			String customerName = user.getFirstName() + " " + user.getLastName();
+			String ownerName = owner != null ? owner.getFirstName() + " " + owner.getLastName() : "Owner";
+			String parkingAreaName = parkingSlot.getParking() != null ? parkingSlot.getParking().getArea() : "Parking Area";
+			String slotInfo = "Slot #" + parkingSlot.getId() + " (" + parkingSlot.getVehicleType() + ")";
+			LocalDateTime smsStart = booking.getStartTime() != null ? booking.getStartTime() : booking.getArrivalDate();
+			LocalDateTime smsEnd = booking.getEndTime() != null ? booking.getEndTime() : booking.getDepartureDate();
+
+			notificationService.sendBookingSmsNotifications(
+				customerPhone, ownerPhone,
+				customerName, ownerName,
+				parkingAreaName, slotInfo,
+				smsStart, smsEnd,
+				resolvedTotalPrice
+			);
+		} catch (Exception e) {
+			log.warn("Failed to send booking SMS notifications: {}", e.getMessage());
+		}
 
 		BookingDTO response = mapper.map(savedBooking, BookingDTO.class);
 		response.setCustomer_id(savedBooking.getUser() != null ? savedBooking.getUser().getId() : null);

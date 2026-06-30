@@ -9,8 +9,8 @@ import com.app.entities.ParkingSlot;
 import com.app.repository.ParkingAreaRepository;
 import com.app.repository.ParkingSlotRepository;
 import com.app.repository.BookingRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,9 +24,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
-@Slf4j
 public class CleanupServiceImpl implements CleanupService {
+
+    private static final Logger log = LoggerFactory.getLogger(CleanupServiceImpl.class);
 
     private final ParkingAreaRepository parkingAreaRepository;
     private final ParkingSlotRepository parkingSlotRepository;
@@ -37,6 +37,14 @@ public class CleanupServiceImpl implements CleanupService {
     // private final ScheduledDeletionRepository scheduledDeletionRepository;
 
     private static final int DEFAULT_INACTIVE_DAYS = 45;
+
+    public CleanupServiceImpl(ParkingAreaRepository parkingAreaRepository, ParkingSlotRepository parkingSlotRepository,
+            BookingRepository bookingRepository, NotificationService notificationService) {
+        this.parkingAreaRepository = parkingAreaRepository;
+        this.parkingSlotRepository = parkingSlotRepository;
+        this.bookingRepository = bookingRepository;
+        this.notificationService = notificationService;
+    }
     
     @Override
     public List<InactiveResourceDTO> getInactiveParkingAreas(int daysInactive) {

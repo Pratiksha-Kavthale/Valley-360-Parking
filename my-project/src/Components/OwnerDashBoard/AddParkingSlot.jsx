@@ -91,7 +91,7 @@ const ParkingSlotForm = () => {
 
         try {
             console.log('Submitting parking slot with data:', { slotNumber, price, vehicleType, status, areaId }); // Debugging form data
-            const response = await api.post('https://spirited-essence-production.up.railway.app/parkingSlots/Add', {
+            const response = await api.post('http://localhost:8080/parkingSlots/Add', {
                 slotNumber,
                 price,
                 vehicleType,
@@ -131,7 +131,7 @@ const ParkingSlotForm = () => {
                             value={slotNumber}
                             onChange={(e) => setSlotNumber(e.target.value)}
                             required
-                            className={`w-full border border-rose-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-rose-400 ${slotNumberError ? 'border-red-500' : ''}`}
+                            className={`w-full border border-rose-200 rounded-md px-3 py-2 text-slate-900 focus:outline-none focus:ring-2 focus:ring-rose-400 ${slotNumberError ? 'border-red-500' : ''}`}
                         />
                         {slotNumberError && <p className="text-red-500 text-sm mt-1">{slotNumberError}</p>}
                     </div>
@@ -144,7 +144,7 @@ const ParkingSlotForm = () => {
                             value={price}
                             onChange={(e) => setPrice(e.target.value)}
                             required
-                            className={`w-full border border-rose-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-rose-400 ${priceError ? 'border-red-500' : ''}`}
+                            className={`w-full border border-rose-200 rounded-md px-3 py-2 text-slate-900 focus:outline-none focus:ring-2 focus:ring-rose-400 ${priceError ? 'border-red-500' : ''}`}
                         />
                         {priceError && <p className="text-red-500 text-sm mt-1">{priceError}</p>}
                     </div>
@@ -156,7 +156,7 @@ const ParkingSlotForm = () => {
                             value={vehicleType}
                             onChange={(e) => setVehicleType(e.target.value)}
                             required
-                            className={`w-full border border-rose-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-rose-400 ${vehicleTypeError ? 'border-red-500' : ''}`}
+                            className={`w-full border border-rose-200 rounded-md px-3 py-2 text-slate-900 focus:outline-none focus:ring-2 focus:ring-rose-400 ${vehicleTypeError ? 'border-red-500' : ''}`}
                         >
                             <option value="">Select Vehicle Type</option>
                             <option value="TWO_WHEELER">Two-Wheeler</option>
@@ -172,7 +172,7 @@ const ParkingSlotForm = () => {
                             value={status}
                             onChange={(e) => setStatus(e.target.value)}
                             required
-                            className={`w-full border border-rose-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-rose-400 ${statusError ? 'border-red-500' : ''}`}
+                            className={`w-full border border-rose-200 rounded-md px-3 py-2 text-slate-900 focus:outline-none focus:ring-2 focus:ring-rose-400 ${statusError ? 'border-red-500' : ''}`}
                         >
                             <option value="">Select Status</option>
                             <option value="AVAILABLE">Available</option>

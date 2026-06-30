@@ -45,7 +45,7 @@ const OwnerDashboard = () => {
         toast.error('User is not authenticated. Please log in.');
         return;
       }
-      const response = await api.get(`https://spirited-essence-production.up.railway.app/booking/today/${ownerId}`);
+      const response = await api.get(`http://localhost:8080/booking/today/${ownerId}`);
       setTodaysBookings(response.data);
     } catch (error) {
       
@@ -60,7 +60,7 @@ const OwnerDashboard = () => {
         toast.error('User is not authenticated. Please log in.');
         return;
       }
-      const response = await api.get(`https://spirited-essence-production.up.railway.app/booking/previous/${ownerId}`);
+      const response = await api.get(`http://localhost:8080/booking/previous/${ownerId}`);
       setPreviousBookings(response.data);
     } catch (error) {
       toast.error('Error fetching previous bookings');

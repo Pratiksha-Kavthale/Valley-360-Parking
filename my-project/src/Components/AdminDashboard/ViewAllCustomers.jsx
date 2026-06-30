@@ -13,7 +13,7 @@ const CustomersList = () => {
 
   const fetchOwners = async () => {
     try {
-      const response = await api.get('https://spirited-essence-production.up.railway.app/User/GetAllCustomers'); // Ensure URL matches the backend
+      const response = await api.get('http://localhost:8080/User/GetAllCustomers'); // Ensure URL matches the backend
       console.log(response.data); // Check this in the browser console
       setOwners(response.data);
     } catch (error) {

@@ -17,6 +17,7 @@ import {
   HiOutlineCreditCard,
   HiOutlineCheckCircle,
   HiOutlineExclamationCircle,
+  HiOutlineQrcode,
 } from 'react-icons/hi';
 import { LuCar, LuCalendarDays, LuHistory, LuPlus, LuSquareParking } from 'react-icons/lu';
 import api from '/src/api';
@@ -560,9 +561,9 @@ const OwnerDashboardEnhanced = () => {
     setLoading(true);
     try {
       const [bookingsRes, previousRes, areasRes] = await Promise.all([
-        api.get(`https://spirited-essence-production.up.railway.app/booking/today/${owner.id}`).catch(() => ({ data: [] })),
-        api.get(`https://spirited-essence-production.up.railway.app/booking/previous/${owner.id}`).catch(() => ({ data: [] })),
-        api.get(`https://spirited-essence-production.up.railway.app/owner/parking-areas`).catch(() => ({ data: [] })),
+        api.get(`http://localhost:8080/booking/today/${owner.id}`).catch(() => ({ data: [] })),
+        api.get(`http://localhost:8080/booking/previous/${owner.id}`).catch(() => ({ data: [] })),
+        api.get(`http://localhost:8080/owner/parking-areas`).catch(() => ({ data: [] })),
       ]);
 
       setTodaysBookings(bookingsRes.data || []);
@@ -571,7 +572,7 @@ const OwnerDashboardEnhanced = () => {
 
       // Try to fetch metrics
       try {
-        const metricsRes = await api.get('https://spirited-essence-production.up.railway.app/owner/analytics/my-metrics');
+        const metricsRes = await api.get('http://localhost:8080/owner/analytics/my-metrics');
         setMetrics(metricsRes.data);
       } catch {
         console.log('Metrics not available');
@@ -972,6 +973,13 @@ const OwnerDashboardEnhanced = () => {
                 description="Verify customer payments"
                 color="emerald"
                 onClick={() => navigate('/owner/payment-review')}
+              />
+              <QuickActionCard
+                icon={HiOutlineQrcode}
+                title="Verify Entry"
+                description="Check QR or OTP"
+                color="amber"
+                onClick={() => navigate('/owner/validate-booking')}
               />
               <QuickActionCard
                 icon={HiOutlineCog}

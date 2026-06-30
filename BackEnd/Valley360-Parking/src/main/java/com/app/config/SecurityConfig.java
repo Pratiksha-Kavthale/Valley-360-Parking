@@ -52,7 +52,8 @@ public class SecurityConfig {
 
                 // ✅ PUBLIC APIs
                 .antMatchers(
-                    "/Admin/Login",
+                    
+                    "/Admin/**",
                     "/Admin/Register",
                     "/User/Login",
                     "/User/Register",
@@ -60,7 +61,8 @@ public class SecurityConfig {
                     "/SignUp",
                     "/api/auth/**",
                     "/swagger*/**",
-                    "/v*/api-docs/**"
+                    "/v*/api-docs/**",
+                    "/contact/**"
                 ).permitAll()
 
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
@@ -69,13 +71,12 @@ public class SecurityConfig {
                 // ✅ ROLE BASED
                 .antMatchers("/Admin/**").hasRole("ADMIN")
                 .antMatchers("/owner/**").hasRole("OWNER")
-
                 .antMatchers("/User/**").hasAnyRole("ADMIN", "OWNER", "CUSTOMER")
                 .antMatchers("/booking/**").hasAnyRole("ADMIN", "OWNER", "CUSTOMER")
                 .antMatchers("/parkingSlots/**").hasAnyRole("ADMIN", "OWNER", "CUSTOMER")
                 .antMatchers("/parkingArea/**").hasAnyRole("ADMIN", "OWNER", "CUSTOMER")
 
-                .antMatchers(HttpMethod.POST, "/reviews/**")
+                .antMatchers("/reviews/**")
                     .hasAnyRole("ADMIN", "OWNER", "CUSTOMER")
 
                 // everything else

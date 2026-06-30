@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import api from '/src/api';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Footer from '../Footer/Footer';
+import { isOwnerPaymentSetupComplete } from '../../utils/paymentSetup';
 
 const initialForm = {
   upiId: '',
@@ -11,9 +13,12 @@ const initialForm = {
 };
 
 const PaymentSettings = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState(initialForm);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const setupRequired = Boolean(location.state?.from);
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -54,6 +59,9 @@ const PaymentSettings = () => {
         paymentEnabled: Boolean(response.data?.paymentEnabled),
       });
       toast.success('Payment settings saved successfully.');
+      if (setupRequired && isOwnerPaymentSetupComplete(response.data)) {
+        navigate('/OwnerDashBoard', { replace: true });
+      }
     } catch (error) {
       toast.error(error?.response?.data?.message || 'Unable to save payment settings.');
     } finally {
@@ -69,8 +77,14 @@ const PaymentSettings = () => {
           <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm sm:p-8">
             <div className="space-y-3">
               <p className="text-sm font-semibold uppercase tracking-[0.2em] text-rose-500">Owner Payments</p>
-              <h1 className="text-3xl font-bold text-slate-900">UPI Payment Settings</h1>
-              <p className="text-slate-600">Configure the UPI handle customers will pay to when booking your parking slots.</p>
+              <h1 className="text-3xl font-bold text-slate-900">
+                {setupRequired ? 'Complete Payment Setup' : 'UPI Payment Settings'}
+              </h1>
+              <p className="text-slate-600">
+                {setupRequired
+                  ? 'Add and enable your UPI payment details before opening the owner dashboard.'
+                  : 'Configure the UPI handle customers will pay to when booking your parking slots.'}
+              </p>
             </div>
 
             {loading ? (

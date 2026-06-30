@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn, FaWhatsapp } from "react-icons/fa";
 import { FiMail, FiPhone, FiMapPin, FiClock, FiSend, FiUser, FiMessageSquare } from "react-icons/fi";
 import Footer from '../Footer/Footer';
+import { contactApi } from '../../api/contact.api';
 
 const ContactUs = () => {
   const [formData, setFormData] = useState({
@@ -14,6 +15,7 @@ const ContactUs = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -23,12 +25,17 @@ const ContactUs = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setIsSubmitting(false);
-    setSubmitted(true);
-    setFormData({ fullName: '', mobileNumber: '', email: '', subject: '', message: '' });
-    setTimeout(() => setSubmitted(false), 3000);
+    setError('');
+    try {
+      await contactApi.sendMessage(formData);
+      setIsSubmitting(false);
+      setSubmitted(true);
+      setFormData({ fullName: '', mobileNumber: '', email: '', subject: '', message: '' });
+      setTimeout(() => setSubmitted(false), 3000);
+    } catch (err) {
+      setIsSubmitting(false);
+      setError(err.response?.data?.message || 'Failed to send message. Please try again.');
+    }
   };
 
   const contactInfo = [
@@ -304,6 +311,12 @@ const ContactUs = () => {
                       className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all resize-none"
                     />
                   </div>
+
+                  {error && (
+                    <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
+                      {error}
+                    </div>
+                  )}
 
                   {/* Submit Button */}
                   <motion.button

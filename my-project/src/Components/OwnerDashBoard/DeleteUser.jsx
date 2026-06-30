@@ -16,7 +16,7 @@ const DeleteUser = () => {
         }
 
         try {
-            const response = await api.delete(`https://spirited-essence-production.up.railway.app/User/Delete/${userId}`);
+            const response = await api.delete(`http://localhost:8080/User/Delete/${userId}`);
 
             if (response.status === 200) {
                 toast.success('User deleted successfully');

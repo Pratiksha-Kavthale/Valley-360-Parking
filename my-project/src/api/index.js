@@ -11,5 +11,6 @@ export { cleanupApi } from './cleanup.api';
 export { analyticsApi } from './analytics.api';
 export { errorTrackingApi } from './errorTracking.api';
 export { notificationApi, NOTIFICATION_TYPES } from './notification.api';
+export { contactApi } from './contact.api';
 
 export default api;

@@ -35,7 +35,7 @@ const UpdateParkingArea = () => {
     // Fetch parking area details by ID
     const fetchParkingArea = async () => {
       try {
-        const response = await api.get(`https://spirited-essence-production.up.railway.app/parkingArea/${id}`);
+        const response = await api.get(`http://localhost:8080/parkingArea/${id}`);
         const { data } = response;
         setArea(data.area);
         setCity(data.city);
@@ -62,7 +62,7 @@ const UpdateParkingArea = () => {
     }
 
     try {
-      const response = await api.put(`https://spirited-essence-production.up.railway.app/parkingArea/update/${id}`, {
+      const response = await api.put(`http://localhost:8080/parkingArea/update/${id}`, {
         area,
         city,
         pincode,

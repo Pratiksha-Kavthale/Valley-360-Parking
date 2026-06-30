@@ -250,7 +250,7 @@ const AdminDashboardNew = () => {
 
   const fetchData = async () => {
     try {
-      const response = await api.get('https://spirited-essence-production.up.railway.app/Admin/dashboard');
+      const response = await api.get('http://localhost:8080/Admin/dashboard');
       setData({
         ...response.data,
         activeBookings: Math.floor(response.data.parkingSlots * 0.7),

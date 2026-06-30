@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import api from '/src/api';
 import { Link, useNavigate } from 'react-router-dom';
+import { isOwnerPaymentSetupComplete } from '../../utils/paymentSetup';
 
 const decodeToken = (token) => {
   try {
@@ -27,7 +28,7 @@ const Login = () => {
     try {
       console.log("email", user.email);
       console.log("password", user.password);
-      const response = await api.post('https://spirited-essence-production.up.railway.app/User/Login', null, {
+      const response = await api.post('http://localhost:8080/User/Login', null, {
         params: {
           email: user.email,
           password: user.password,
@@ -56,7 +57,8 @@ const Login = () => {
       if (loggedInUser.userRoles[0] == "ROLE_CUSTOMER") {
         navigate('/UserDashBoard');
       } else if (loggedInUser.userRoles[0] == "ROLE_OWNER") {
-        navigate('/OwnerDashBoard');
+        const paymentSettings = await api.get('/owner/payment-settings');
+        navigate(isOwnerPaymentSetupComplete(paymentSettings.data) ? '/OwnerDashBoard' : '/owner/payment-settings');
       } else {
         console.log('Unrecognized user role.');
       }

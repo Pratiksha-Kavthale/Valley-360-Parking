@@ -55,12 +55,12 @@ const ParkingSlots = () => {
         }
         
         // Fetch slots
-        const slotsResponse = await api.get(`https://spirited-essence-production.up.railway.app/parkingSlots/${parkingId}`);
+        const slotsResponse = await api.get(`http://localhost:8080/parkingSlots/${parkingId}`);
         setSlots(slotsResponse.data);
         
         // Fetch parking area details
         try {
-          const areaResponse = await api.get(`https://spirited-essence-production.up.railway.app/parkingArea/${parkingId}`);
+          const areaResponse = await api.get(`http://localhost:8080/parkingArea/${parkingId}`);
           setParkingArea(areaResponse.data);
         } catch (error) {
           console.log('Could not fetch parking area details');

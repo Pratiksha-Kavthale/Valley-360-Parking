@@ -8,8 +8,8 @@ import com.app.entities.User;
 import com.app.enums.RoleEnum;
 import com.app.repository.OwnerMetricsRepository;
 import com.app.repository.ReviewRepository;
-import com.app.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
+import com.app.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,13 +20,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Service for calculating and updating owner trust scores
  * Based on review analysis and metrics
  */
-@Slf4j
 @Service
+@Slf4j
 @Transactional
 public class OwnerScoreService {
 
@@ -53,12 +55,12 @@ public class OwnerScoreService {
      */
     public void recalculateOwnerScore(Long ownerId) {
         try {
-            log.info("Recalculating trust score for owner: {}", ownerId);
+            //log.info("Recalculating trust score for owner: {}", ownerId);
 
             User owner = userRepository.findById(ownerId)
                     .orElse(null);
             if (owner == null) {
-                log.warn("Skipping trust score recalculation. Owner not found: {}", ownerId);
+                //log.warn("Skipping trust score recalculation. Owner not found: {}", ownerId);
                 return;
             }
 
@@ -138,8 +140,8 @@ public class OwnerScoreService {
             // Save metrics
             ownerMetricsRepository.save(metrics);
 
-            log.info("Trust score updated for owner {} - Score: {}, Risk Level: {}",
-                    ownerId, trustScore, metrics.getRiskLevel());
+            System.out.println("Trust score updated for owner {} - Score: {}, Risk Level: {}"+
+                    ownerId+ trustScore+ metrics.getRiskLevel());
 
         } catch (Exception e) {
             log.error("Error recalculating owner score for owner: {}", ownerId, e);
@@ -234,13 +236,18 @@ public class OwnerScoreService {
         List<User> owners = userRepository.findAllByRoleName(RoleEnum.ROLE_OWNER);
 
         return owners.stream()
-                .map(owner -> {
-                    List<Review> reviews = reviewRepository.findByOwnerIdOrderByCreatedAtDesc(owner.getId());
+                .<AdminOwnerRiskResponse>map(owner -> {
+
+                    List<Review> reviews =
+                            reviewRepository.findByOwnerIdOrderByCreatedAtDesc(owner.getId());
 
                     int totalReviews = reviews.size();
+
                     String ownerName = resolveOwnerName(owner);
 
+
                     if (totalReviews == 0) {
+
                         return AdminOwnerRiskResponse.builder()
                                 .ownerId(owner.getId())
                                 .ownerName(ownerName)
@@ -252,44 +259,89 @@ public class OwnerScoreService {
                                 .trend(TREND_STABLE)
                                 .suggestedAction("Collect More Reviews")
                                 .build();
+
                     }
 
-                    double avgRating = reviews.stream().mapToInt(Review::getRating).average().orElse(0.0);
-                    int negativeCount = countNegativeReviews(reviews);
-                    int securityComplaints = (int) reviews.stream()
-                            .filter(r -> Boolean.TRUE.equals(r.getSecurityFlag())).count();
-                    int cleanlinessComplaints = (int) reviews.stream()
-                            .filter(r -> Boolean.TRUE.equals(r.getCleanlinessFlag())).count();
-                    int repeatedBadComplaints = countRepeatedBadComplaints(reviews);
 
-                    double negativePercent = (negativeCount * 100.0) / totalReviews;
+                    double avgRating =
+                            reviews.stream()
+                                    .mapToInt(Review::getRating)
+                                    .average()
+                                    .orElse(0.0);
+
+
+                    int negativeCount = countNegativeReviews(reviews);
+
+
+                    int securityComplaints =
+                            (int) reviews.stream()
+                                    .filter(r -> Boolean.TRUE.equals(r.getSecurityFlag()))
+                                    .count();
+
+
+                    int cleanlinessComplaints =
+                            (int) reviews.stream()
+                                    .filter(r -> Boolean.TRUE.equals(r.getCleanlinessFlag()))
+                                    .count();
+
+
+                    int repeatedBadComplaints =
+                            countRepeatedBadComplaints(reviews);
+
+
+                    double negativePercent =
+                            (negativeCount * 100.0) / totalReviews;
+
+
                     String trend = detectTrend(reviews);
 
-                    double trustScore = calculateDynamicTrustScore(
-                            avgRating,
-                            negativePercent,
-                            securityComplaints,
-                            cleanlinessComplaints,
-                            repeatedBadComplaints,
-                            trend,
-                            reviews);
 
-                    String riskLevel = resolveRiskLevel(trustScore, totalReviews);
-                    String suggestedAction = resolveSuggestedAction(riskLevel, trend, securityComplaints);
+                    double trustScore =
+                            calculateDynamicTrustScore(
+                                    avgRating,
+                                    negativePercent,
+                                    securityComplaints,
+                                    cleanlinessComplaints,
+                                    repeatedBadComplaints,
+                                    trend,
+                                    reviews
+                            );
+
+
+                    String riskLevel =
+                            resolveRiskLevel(trustScore, totalReviews);
+
+
+                    String suggestedAction =
+                            resolveSuggestedAction(
+                                    riskLevel,
+                                    trend,
+                                    securityComplaints
+                            );
+
 
                     return AdminOwnerRiskResponse.builder()
                             .ownerId(owner.getId())
                             .ownerName(ownerName)
-                            .trustScore(Math.round(trustScore * 100.0) / 100.0)
+                            .trustScore(
+                                    Math.round(trustScore * 100.0) / 100.0
+                            )
                             .riskLevel(riskLevel)
                             .totalReviews(totalReviews)
-                            .negativePercent(Math.round(negativePercent * 100.0) / 100.0)
+                            .negativePercent(
+                                    Math.round(negativePercent * 100.0) / 100.0
+                            )
                             .securityComplaints(securityComplaints)
                             .trend(trend)
                             .suggestedAction(suggestedAction)
                             .build();
+
                 })
-                .sorted(Comparator.comparingDouble(AdminOwnerRiskResponse::getTrustScore))
+                .sorted(
+                    Comparator.comparingDouble(
+                        AdminOwnerRiskResponse::getTrustScore
+                    )
+                )
                 .collect(Collectors.toList());
     }
 

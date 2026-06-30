@@ -92,4 +92,111 @@ public class OwnerMetrics {
     public enum RiskLevel {
         LOW, MEDIUM, HIGH, CRITICAL
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
+    }
+
+
+    public Integer getTotalReviews() {
+        return totalReviews;
+    }
+
+    public void setTotalReviews(Integer totalReviews) {
+        this.totalReviews = totalReviews;
+    }
+
+
+    public Integer getPositiveReviews() {
+        return positiveReviews;
+    }
+
+    public void setPositiveReviews(Integer positiveReviews) {
+        this.positiveReviews = positiveReviews;
+    }
+
+
+    public Integer getNeutralReviews() {
+        return neutralReviews;
+    }
+
+    public void setNeutralReviews(Integer neutralReviews) {
+        this.neutralReviews = neutralReviews;
+    }
+
+
+    public Integer getNegativeReviews() {
+        return negativeReviews;
+    }
+
+    public void setNegativeReviews(Integer negativeReviews) {
+        this.negativeReviews = negativeReviews;
+    }
+
+
+    public Integer getSecurityFlags() {
+        return securityFlags;
+    }
+
+    public void setSecurityFlags(Integer securityFlags) {
+        this.securityFlags = securityFlags;
+    }
+
+
+    public Integer getCleanlinessFlags() {
+        return cleanlinessFlags;
+    }
+
+    public void setCleanlinessFlags(Integer cleanlinessFlags) {
+        this.cleanlinessFlags = cleanlinessFlags;
+    }
+
+
+    public Double getAverageRating() {
+        return averageRating;
+    }
+
+    public void setAverageRating(Double averageRating) {
+        this.averageRating = averageRating;
+    }
+
+
+    public Double getTrustScore() {
+        return trustScore;
+    }
+
+    public void setTrustScore(Double trustScore) {
+        this.trustScore = trustScore;
+    }
+
+
+    public RiskLevel getRiskLevel() {
+        return riskLevel;
+    }
+
+    public void setRiskLevel(RiskLevel riskLevel) {
+        this.riskLevel = riskLevel;
+    }
+
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }

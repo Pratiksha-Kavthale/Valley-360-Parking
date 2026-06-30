@@ -34,11 +34,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 @RequestMapping("/booking")
-//@CrossOrigin(origins = "http://localhost:5173")
-@CrossOrigin(origins = {
-	    "http://localhost:5173",
-	    "https://valley-360-parking-7zi9-ript5gl4k.vercel.app"
-	})
+@CrossOrigin(origins = "http://localhost:5173")
+//@CrossOrigin(origins = {
+//	    "http://localhost:5173",
+//	    "https://valley-360-parking-7zi9-ript5gl4k.vercel.app"
+//	})
 public class BookingController {
 
     private final BookingService bookingService;

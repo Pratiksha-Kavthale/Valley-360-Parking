@@ -5,6 +5,9 @@ import com.app.dto.NotificationDTO;
 import com.app.entities.User;
 import com.app.enums.RoleEnum;
 import com.app.repository.UserRepository;
+import com.twilio.Twilio;
+import com.twilio.rest.api.v2010.account.Message;
+import com.twilio.type.PhoneNumber;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,10 +19,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
 
 @Service
 @RequiredArgsConstructor
@@ -33,11 +39,33 @@ public class NotificationServiceImpl implements NotificationService {
     // Optional - may need to create this repository
     // private final NotificationRepository notificationRepository;
 
-    @Value("${app.base-url:http://localhost:3000}")
+    @Value("${app.base-url:http://localhost:5173}")
     private String baseUrl;
 
     @Value("${spring.mail.username:noreply@valley360.com}")
     private String fromEmail;
+
+    @Value("${twilio.accountSid}")
+    private String twilioAccountSid;
+
+    @Value("${twilio.authToken}")
+    private String twilioAuthToken;
+
+    @Value("${twilio.fromPhone}")
+    private String twilioFromPhone;
+
+    @PostConstruct
+    public void initTwilio() {
+        try {
+            log.info("Initializing Twilio with SID={}, fromPhone={}",
+                twilioAccountSid != null ? twilioAccountSid.substring(0, Math.min(10, twilioAccountSid.length())) + "..." : "null",
+                twilioFromPhone);
+            Twilio.init(twilioAccountSid, twilioAuthToken);
+            log.info("Twilio SMS service initialized successfully");
+        } catch (Exception e) {
+            log.error("Failed to initialize Twilio: {}", e.getMessage());
+        }
+    }
 
     @Override
     public void sendRealTimeNotification(Long userId, NotificationDTO notification) {
@@ -227,16 +255,60 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public void sendSms(String phoneNumber, String message) {
-        // Implement SMS sending using a service like Twilio, AWS SNS, etc.
-        // For now, just log it
-        log.info("SMS to {}: {}", phoneNumber, message);
-        
-        // Example Twilio implementation:
-        // twilioClient.messages.create(
-        //     new PhoneNumber(phoneNumber),
-        //     new PhoneNumber(twilioFromNumber),
-        //     message
-        // );
+        try {
+            Message.creator(
+                new PhoneNumber(phoneNumber),
+                new PhoneNumber(twilioFromPhone),
+                message
+            ).create();
+            log.info("SMS sent to {}: {}", phoneNumber, message);
+        } catch (Exception e) {
+            log.error("Failed to send SMS to {}: {}", phoneNumber, e.getMessage());
+        }
+    }
+
+    @Override
+    public void sendBookingSmsNotifications(String customerPhone, String ownerPhone,
+                                              String customerName, String ownerName,
+                                              String parkingAreaName, String slotInfo,
+                                              LocalDateTime startTime, LocalDateTime endTime,
+                                              double totalPrice) {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MMM-yyyy hh:mm a");
+
+        String customerMsg = String.format(
+            "Dear %s, your parking slot has been booked successfully!\n\n" +
+            "Parking Area: %s\n" +
+            "Slot: %s\n" +
+            "From: %s\n" +
+            "To: %s\n" +
+            "Total Amount: Rs. %.2f\n\n" +
+            "Thank you for choosing Valley 360 Parking.",
+            customerName, parkingAreaName, slotInfo,
+            startTime.format(dtf), endTime.format(dtf), totalPrice
+        );
+
+        if (customerPhone != null && !customerPhone.isBlank()) {
+            System.out.println("done");
+        	sendSms(customerPhone, customerMsg);
+        }
+
+        String ownerMsg = String.format(
+            "Dear %s, a parking slot has been booked by a customer.\n\n" +
+            "Customer: %s\n" +
+            "Parking Area: %s\n" +
+            "Slot: %s\n" +
+            "From: %s\n" +
+            "To: %s\n" +
+            "Total Amount: Rs. %.2f\n\n" +
+            "Please ensure the slot is ready for the customer.",
+            ownerName, customerName, parkingAreaName, slotInfo,
+            startTime.format(dtf), endTime.format(dtf), totalPrice
+        );
+
+        if (ownerPhone != null && !ownerPhone.isBlank()) {
+        	System.out.println("done2");
+        	sendSms(ownerPhone, ownerMsg);
+        }
     }
 
     @Override

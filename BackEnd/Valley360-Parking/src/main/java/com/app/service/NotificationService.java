@@ -4,6 +4,7 @@ import com.app.dto.CleanupReportDTO;
 import com.app.dto.NotificationDTO;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -61,6 +62,15 @@ public interface NotificationService {
      * Send SMS notification
      */
     void sendSms(String phoneNumber, String message);
+
+    /**
+     * Send booking SMS notifications to both customer and owner with formatted messages
+     */
+    void sendBookingSmsNotifications(String customerPhone, String ownerPhone,
+                                     String customerName, String ownerName,
+                                     String parkingAreaName, String slotInfo,
+                                     LocalDateTime startTime, LocalDateTime endTime,
+                                     double totalPrice);
     
     /**
      * Send monthly cleanup report to admins

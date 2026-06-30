@@ -55,7 +55,7 @@ const Registration = () => {
             // Check if registering as admin
             if (roleId === '1') {
                 // Admin registration with employee ID verification
-                const response = await fetch(`https://spirited-essence-production.up.railway.app/Admin/Register?employeeId=${employeeId}`, {
+                const response = await fetch(`http://localhost:8080/Admin/Register?employeeId=${employeeId}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -80,7 +80,7 @@ const Registration = () => {
                 }
             } else {
                 // Regular user registration
-                await api.post('https://spirited-essence-production.up.railway.app/User/Register', {
+                await api.post('http://localhost:8080/User/Register', {
                     firstName,
                     lastName,
                     email,

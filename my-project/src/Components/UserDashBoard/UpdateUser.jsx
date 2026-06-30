@@ -24,7 +24,7 @@ const UpdateUserPage = () => {
         
         // Fetch full user details from API
         try {
-          const response = await api.get(`https://spirited-essence-production.up.railway.app/User/${parsedUser.id}`);
+          const response = await api.get(`http://localhost:8080/User/${parsedUser.id}`);
           const userData = response.data;
           // Pre-populate form with existing data
           setFirstName(userData.firstName || '');
@@ -86,7 +86,7 @@ const UpdateUserPage = () => {
     e.preventDefault();
     setSaving(true);
     try {
-      await api.put(`https://spirited-essence-production.up.railway.app/User/updateUser/${user.email}`, {
+      await api.put(`http://localhost:8080/User/updateUser/${user.email}`, {
         firstName,
         lastName,
         contact,

@@ -9,7 +9,7 @@ const ViewAllParkingSlots = () => {
     useEffect(() => {
         const fetchParkingSlots = async () => {
             try {
-                const response = await api.get('https://spirited-essence-production.up.railway.app/parkingSlots/GetAllParkingSlots');
+                const response = await api.get('http://localhost:8080/parkingSlots/GetAllParkingSlots');
                 setParkingSlots(response.data);
             } catch (error) {
                 setError('Error fetching parking slots');

@@ -69,7 +69,7 @@ const AddParkingArea = () => {
 
 
     try {
-      const response = await api.post('https://spirited-essence-production.up.railway.app/parkingArea/add', {
+      const response = await api.post('http://localhost:8080/parkingArea/add', {
         area,
         city,
         pincode,
@@ -127,7 +127,7 @@ const AddParkingArea = () => {
                 type="text"
                 value={area}
                 onChange={(e) => setArea(e.target.value)}
-                className="w-full border border-rose-200 rounded-md px-3 py-2 outline-none focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-400"
+                className="w-full text-black border border-rose-200 rounded-md px-3 py-2 outline-none focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-400"
                 required
               />
             </div>
@@ -138,7 +138,7 @@ const AddParkingArea = () => {
                 type="text"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
-                className="w-full border border-rose-200 rounded-md px-3 py-2 outline-none focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-400"
+                className="w-full text-black border border-rose-200 rounded-md px-3 py-2 outline-none focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-400"
                 required
               />
             </div>
@@ -149,7 +149,7 @@ const AddParkingArea = () => {
                 type="text"
                 value={pincode}
                 onChange={(e) => setPincode(e.target.value)}
-                className={`w-full border rounded-md px-3 py-2 outline-none focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-400 ${pincodeError ? 'border-red-500' : 'border-rose-200'}`}
+                className={`w-full border text-black rounded-md px-3 py-2 outline-none focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-400 ${pincodeError ? 'border-red-500' : 'border-rose-200'}`}
                 required
               />
               {pincodeError && <p className="text-red-500 text-sm mt-1">{pincodeError}</p>}
@@ -161,7 +161,7 @@ const AddParkingArea = () => {
                 type="text"
                 value={latitude}
                 onChange={(e) => setLatitude(e.target.value)}
-                className="w-full border border-rose-200 rounded-md px-3 py-2 outline-none focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-400"
+                className="w-full border text-black border-rose-200 rounded-md px-3 py-2 outline-none focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-400"
                 readOnly
               />
             </div>
@@ -172,7 +172,7 @@ const AddParkingArea = () => {
                 type="text"
                 value={longitude}
                 onChange={(e) => setLongitude(e.target.value)}
-                className="w-full border border-rose-200 rounded-md px-3 py-2 outline-none focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-400"
+                className="w-full border text-black border-rose-200 rounded-md px-3 py-2 outline-none focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-400"
                 readOnly
               />
             </div>
@@ -182,9 +182,9 @@ const AddParkingArea = () => {
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
-                className="w-full border border-rose-200 rounded-md px-3 py-2 outline-none focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-400"
+                className="w-full border text-black border-rose-200 rounded-md px-3 py-2 outline-none focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-400"
               >
-                <option value="AVAILABLE">AVAILABLE</option>
+                <option value="AVAILABLE ">AVAILABLE</option>
                 <option value="NOT_AVAILABLE">NOT_AVAILABLE</option>
               </select>
             </div>
